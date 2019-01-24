@@ -1,0 +1,121 @@
+
+\documentstyle{article}
+\begin{document}
+\textheight25cm
+\textwidth16cm
+
+\author{Matthias Schunter\\ Teichstr. 1\\[0.3em] D-2900 Oldenburg}
+\title{{\tt TeXTableForm.m} --- A package for converting Mathematica 2.0 Lists 
+into LaTeX Tables}
+\maketitle
+\vfill
+\tableofcontents
+\vfill
+\vfill
+\clearpage
+\section{What it does}
+The TeXTableForm package generates LaTeX input from Mathematica lists. 
+It may be used to typeset large amounts of data 
+(e.g.\ with supertab.sty).
+
+This Version is 1.0 from Januar 28,1993 
+and it is public--domain. Changed versions must not be distributed 	
+without prior written permission.
+
+Send bug reports and suggestions to:
+
+\centerline{\verb+schunter@informatik.uni-hildesheim.de+}.
+
+\section{How it works}
+\verb+TeXTableForm[list,n]+ generates a LaTeX-table
+each sublist of list is put into one litle row. 
+These rows are ordered in n big columns. 
+\verb+list+ may be nested up to level 2.
+
+TeXTableForm[list,n,\"filename\"] writes the output to the according file
+
+\section{Options}
+\verb+TableBegin->"def"+ sets the table definition to def.
+The identifier \verb+columns+ may be used to insert the number of big columns;
+The identifier \verb+width+ may be used to insert the width of each column. 
+Default is: 
+\begin{verbatim}
+TableBegin -> "\begin{tabular}{|*{columns}{*{width}{|l}|}|}\n"
+\end{verbatim}
+
+\verb+TableEnd->"def"+ sets the text wich is included at the end of the table.
+Default is \verb+TableEnd -> "\end{tabular}"+. This Option is useful
+if you want to use the supertabular environement.
+
+
+\section{A short example}
+The Mathematica input:
+
+\begin{verbatim}
+In[1]:= <<TeXTableForm`;
+
+In[2]:= t=Table[i,{i,1,22}];
+
+In[3]:= TeXTableForm[t,5,"tab1.tab"];
+\end{verbatim}
+
+The result is shown in Table~\ref{tab1}.
+This table was produced with:
+\begin{verbatim}
+\begin{table}
+\begin{center}
+\input tab1
+\end{center}
+\caption{Our first example}\caption{tab1}
+\end{table}
+\end{verbatim}
+\begin{table}
+\begin{center}
+\begin{tabular}{|*{5}{*{1}{|l}|}|}
+$1$ & $6$ & $11$ & $16$ & $21$ \\
+$2$ & $7$ & $12$ & $17$ & $22$ \\
+$3$ & $8$ & $13$ & $18$ &   \\
+$4$ & $9$ & $14$ & $19$ &   \\
+$5$ & $10$ & $15$ & $20$ &   \\
+\end{tabular}
+\end{center}
+\caption{Our first example}\label{tab1}
+\end{table}
+
+Our next example is a little more difficult:
+\begin{verbatim}
+In[1]:= <<TeXTableForm`;
+
+In[2]:= t=Table[{i,Sqrt[i]},{i,1,22}];
+
+In[3]:= TeXTableForm[t,3,"tab2.tab"];
+\end{verbatim}
+
+The result is shown in Table~\ref{tab2}.
+It was produced by:
+\begin{verbatim}
+\begin{table}
+\begin{center}
+\input tab2.tab
+\caption{Our second example}\label{tab2}
+\end{center}
+\end{table}
+\end{verbatim}
+\begin{table}
+\begin{center}
+\begin{tabular}{|*{3}{*{2}{|l}|}|}
+$1$ & $1$ & $9$ & $3$ & $17$ & ${\sqrt{17}}$ \\
+$2$ & ${\sqrt{2}}$ & $10$ & ${\sqrt{10}}$ & $18$ & $3\,{\sqrt{2}}$ \\
+$3$ & ${\sqrt{3}}$ & $11$ & ${\sqrt{11}}$ & $19$ & ${\sqrt{19}}$ \\
+$4$ & $2$ & $12$ & $2\,{\sqrt{3}}$ & $20$ & $2\,{\sqrt{5}}$ \\
+$5$ & ${\sqrt{5}}$ & $13$ & ${\sqrt{13}}$ & $21$ & ${\sqrt{21}}$ \\
+$6$ & ${\sqrt{6}}$ & $14$ & ${\sqrt{14}}$ & $22$ & ${\sqrt{22}}$ \\
+$7$ & ${\sqrt{7}}$ & $15$ & ${\sqrt{15}}$ &   &   \\
+$8$ & ${2^{{3\over 2}}}$ & $16$ & $4$ &   &   \\
+\end{tabular}
+\end{center}
+\caption{Our second example}\label{tab2}
+\end{table}
+
+\end{document}
+

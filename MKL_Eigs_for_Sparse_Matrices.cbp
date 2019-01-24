@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="MKL_Eigs_for_Sparse_Matrices"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="MKL_Eigs_for_Sparse_Matrices">
+				<Option output="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/MKL_Eigs_for_Sparse_Matrices" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/alexander/intel/compilers_and_libraries_2019.1.144/linux/mkl/include"/>
+					<Add directory="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/../Singleton-Logger/sln/Sources"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 MKL_Eigs_for_Sparse_Matrices"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="MKL_Eigs_for_Sparse_Matrices/fast">
+				<Option output="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/MKL_Eigs_for_Sparse_Matrices" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/alexander/intel/compilers_and_libraries_2019.1.144/linux/mkl/include"/>
+					<Add directory="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/../Singleton-Logger/sln/Sources"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 MKL_Eigs_for_Sparse_Matrices/fast"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/main.cpp">
+			<Option target="MKL_Eigs_for_Sparse_Matrices"/>
+		</Unit>
+		<Unit filename="/home/alexander/Documents/Singleton-Logger/sln/Sources/SingletonLogger.cpp">
+			<Option target="MKL_Eigs_for_Sparse_Matrices"/>
+		</Unit>
+		<Unit filename="/home/alexander/Documents/Singleton-Logger/sln/Sources/SingletonLogger.hpp">
+			<Option target="MKL_Eigs_for_Sparse_Matrices"/>
+		</Unit>
+		<Unit filename="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

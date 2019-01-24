@@ -1,0 +1,3 @@
+*.nb -text -diff
+output/P1P1/* -text -diff
+output/P2P1/* -text -diff
