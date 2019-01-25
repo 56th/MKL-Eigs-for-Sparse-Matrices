@@ -3,6 +3,7 @@
 
 (* https://reference.wolfram.com/language/workflow/CreateWolframLanguageScripts.html *)
 (* https://mathematica.stackexchange.com/a/175546/49280 *)
+(* also may run w/: #!/usr/local/bin/wolfram -script *)
 {aName, mName} = $ScriptCommandLine[[{2, 3}]];
 oName = aName <> ".lambda.txt";
 Print["input:  ", aName, "\n        ", mName];
@@ -10,8 +11,9 @@ Print["output: ", oName];
 
 
 (* SetDirectory@NotebookDirectory[]
-aName = "P1P1/h=0.833332_A_block_0.mtx"
-mName = "P1P1/h=0.833332_eps=0.0001_M_block_0.mtx" *)
+h = ToString@First@Import["h.txt", "List"];
+aName = "P1P1/h="<>h<>"_A_block_0.mtx";
+mName = "P1P1/h="<>h<>"_eps=0.0001_M_block_0.mtx"; *)
 
 
 Get["https://raw.githubusercontent.com/dih5/TgBot/master/TgBot/TgBot.m"];
@@ -20,7 +22,7 @@ tgChatID = Import["tg.txt", "List"][[1]];
 tgToken = Import["tg.txt", "List"][[2]];
 BotAPICall["getUpdates",{},{"Token"->tgToken}];
 tg[text_, time_]:=BotAPICall["sendMessage", {"chat_id"->tgChatID, "text" -> 
-	"eigs.wls: " <> text <> " ("<> ToString[time / 60.] <>" min, " <> ToString[MemoryInUse[] * 10.^-6] <> " Mb)"},
+	"eigs.wls: " <> text <> " ("<> ToString@CForm[time / 60.] <>" min, " <> ToString@CForm[MemoryInUse[] * 10.^-6] <> " Mb)"},
 {"Token"->tgToken}];
 
 
