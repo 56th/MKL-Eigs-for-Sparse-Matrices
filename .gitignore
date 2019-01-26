@@ -350,6 +350,6 @@ TSWLatexianTemp*
 stdin.txt
 output/tg.txt
 
-output/P*P1/*
-!output/P*P1/h=0.833332_*
-!output/P*P1/h=0.416666_*
+h=*
+!h=0.833332_*
+!h=0.416666_*

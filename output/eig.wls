@@ -22,11 +22,11 @@ tgChatID = Import["tg.txt", "List"][[1]];
 tgToken = Import["tg.txt", "List"][[2]];
 BotAPICall["getUpdates",{},{"Token"->tgToken}];
 tg[text_, time_]:=BotAPICall["sendMessage", {"chat_id"->tgChatID, "text" -> 
-	"eigs.wls: " <> text <> " ("<> ToString@CForm[time / 60.] <>" min, " <> ToString@CForm[MemoryInUse[] * 10.^-6] <> " Mb)"},
+	"eig.wls: " <> text <> " ("<> ToString@TeXForm@ScientificForm[time / 60., 3] <>" min, " <> ToString@TeXForm@ScientificForm[MaxMemoryUsed[] * 10.^-6, 3] <> " Mb)"},
 {"Token"->tgToken}];
 
 
-time = First@Timing[
+time = First@AbsoluteTiming[
 	A = Import[aName];
 	M = Import[mName]; 
 	n = Length@A;
@@ -44,16 +44,16 @@ findMaxArn[A_, M_] := Module[{l, x},
 ]
 
 
-time = First@Timing[
+time = First@AbsoluteTiming[
 	{lMin, lMinRes} = findMinArn[A, M]; 
 ];
-tg["lambda_min = " <> ToString@CForm@lMin <> ", residual = " <> ToString@CForm@lMinRes, time];
+tg["lambda_min = " <> ToString@TeXForm@ScientificForm[lMin, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMinRes, 3], time];
 
 
-time = First@Timing[
+time = First@AbsoluteTiming[
 	{lMax, lMaxRes} = findMaxArn[A, M]; 
 ];
-tg["lambda_max = " <> ToString@CForm@lMax <> ", residual = " <> ToString@CForm@lMaxRes, time];
+tg["lambda_max = " <> ToString@TeXForm@ScientificForm[lMax, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMaxRes, 3], time];
 
 
-Export[oName, <| "lambdas" -> {lMin, lMax}, "residuals" -> {lMinRes, lMaxRes} |>];
+Export[oName, <| "n" -> n, "lambdas" -> {lMin, lMax}, "residuals" -> {lMinRes, lMaxRes} |>];
