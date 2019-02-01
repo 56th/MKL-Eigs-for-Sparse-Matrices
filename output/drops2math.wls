@@ -21,6 +21,10 @@ Subscript[n, A]=Length@A;
 Subscript[n, S]=Length@Subscript[M, 0];
 Subscript[C, full]=Import[inDirC<>"C_full.mtx"];
 Subscript[C, n]=Import[inDirC<>"C_n.mtx"];
+Print["size of A =      ", Length@A]
+Print["size of M =      ", Length@Subscript[M, 0]]
+Print["size of C_n    = ", Length@Subscript[C, n]]
+Print["size of C_full = ", Length@Subscript[C, full]]
 
 
 \[Epsilon] =10.^-4;
