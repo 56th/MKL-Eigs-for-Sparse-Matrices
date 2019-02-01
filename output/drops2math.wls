@@ -8,6 +8,7 @@ meshLevel=ToExpression@$ScriptCommandLine[[3]];
 
 h={0.833332,0.416666,0.208333,0.104167,0.052083,0.026042,0.013021};
 hStr=ToString/@h;
+Print["h = ", hStr[[meshLevel]]];
 inDir=FE<>"/blocks/h="<>hStr[[meshLevel]]<>"_";
 inDirC="P1P1/blocks/h="<>hStr[[meshLevel]]<>"_";
 oDir=FE<>"/h="<>hStr[[meshLevel]]<>"_";
@@ -32,7 +33,7 @@ Subscript[\[ScriptCapitalM], n]=ArrayFlatten[{{ SparseArray[{{i_,i_}->\[Epsilon]
 
 
 format="mtx";
-Export[oDir<>"size.txt",<|"nA"->Subscript[n, A],"nS"->Subscript[n, S]|>]
-Export[oDir<>"A_block_0."<>format,Subscript[\[ScriptCapitalA], 0]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_0."<>format,Subscript[\[ScriptCapitalM], 0]]
-Export[oDir<>"A_block_full."<>format,Subscript[\[ScriptCapitalA], full]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_full."<>format,Subscript[\[ScriptCapitalM], full]]
-Export[oDir<>"A_block_n."<>format,Subscript[\[ScriptCapitalA], n]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_n."<>format,Subscript[\[ScriptCapitalM], n]]
+Print@Export[oDir<>"size.txt", <|"nA"->Subscript[n, A],"nS"->Subscript[n, S]|>]
+Print[Export[oDir<>"A_block_0."<>format,Subscript[\[ScriptCapitalA], 0]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_0."<>format,Subscript[\[ScriptCapitalM], 0]]]
+Print[Export[oDir<>"A_block_full."<>format,Subscript[\[ScriptCapitalA], full]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_full."<>format,Subscript[\[ScriptCapitalM], full]]]
+Print[Export[oDir<>"A_block_n."<>format,Subscript[\[ScriptCapitalA], n]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_n."<>format,Subscript[\[ScriptCapitalM], n]]]
