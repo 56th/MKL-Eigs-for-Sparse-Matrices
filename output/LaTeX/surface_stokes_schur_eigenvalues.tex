@@ -7,8 +7,6 @@
 % tables
 \usepackage{multirow}
 \usepackage{hhline}
-\usepackage{colortbl}
-\usepackage{wrapfig}
 \let\oldtabular\tabular
 \renewcommand{\tabular}[1][1.5]{\def\arraystretch{#1}\oldtabular}
 
@@ -31,14 +29,28 @@
 \begin{table}[h!]
 	\centering
 	\caption{$\vect P_1$\,--\,$P_1$} 
-	\label{p1p1}
+	\label{tab:p1p1}
 	\begin{tabular}[1.5]{|c|c|c|c|c|c|c|c|c|}
 		\hline
-		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} & \multicolumn{2}{c|}{$\vect S_n$} \\ 
+		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 		\cline{4-9}
 		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
 		\hline
 		\input{P1P1_table.tex}
+	\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\caption{$\vect P_2$\,--\,$P_1$} 
+	\label{tab:p2p1}
+	\begin{tabular}[1.5]{|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+		\cline{4-9}
+		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+		\hline
+		\input{P2P1_table.tex}
 	\end{tabular}
 \end{table}
 

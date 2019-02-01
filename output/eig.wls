@@ -4,6 +4,7 @@
 (* https://reference.wolfram.com/language/workflow/CreateWolframLanguageScripts.html *)
 (* https://mathematica.stackexchange.com/a/175546/49280 *)
 (* also may run w/: #!/usr/local/bin/wolfram -script *)
+If[Length@$ScriptCommandLine < 3, Print["Error: please specify 2 matrices"]; Quit[]];
 {aName, mName} = $ScriptCommandLine[[{2, 3}]];
 oName = aName <> ".lambda.txt";
 Print["input:  ", aName, "\n        ", mName];
