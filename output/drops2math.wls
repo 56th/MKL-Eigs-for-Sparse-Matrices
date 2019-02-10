@@ -1,17 +1,18 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
-If[Length@$ScriptCommandLine < 3, Print["Error: please specify FE and meshlevel"]; Quit[]];
-FE=$ScriptCommandLine[[2]];
-meshLevel=ToExpression@$ScriptCommandLine[[3]];
+If[Length@$ScriptCommandLine < 4, Print["Error: please specify surface, FE, and meshlevel"]; Quit[]];
+surface=$ScriptCommandLine[[2]];
+FE=$ScriptCommandLine[[3]];
+meshLevel=ToExpression@$ScriptCommandLine[[4]];
 
 
 h={0.833332,0.416666,0.208333,0.104167,0.052083,0.026042,0.013021};
 hStr=ToString/@h;
 Print["h = ", hStr[[meshLevel]]];
-inDir=FE<>"/blocks/h="<>hStr[[meshLevel]]<>"_";
-inDirC="P1P1/blocks/h="<>hStr[[meshLevel]]<>"_";
-oDir=FE<>"/h="<>hStr[[meshLevel]]<>"_";
+inDir = surface<>"/"<>FE<>"/blocks/h="<>hStr[[meshLevel]]<>"_";
+inDirC = surface<>"/P1P1/blocks/h="<>hStr[[meshLevel]]<>"_";
+oDir = surface<>"/"<>FE<>"/h="<>hStr[[meshLevel]]<>"_";
 
 
 A=Import[inDir<>"A.mtx"];
@@ -27,7 +28,7 @@ Print["size of C_n    = ", Length@Subscript[C, n]]
 Print["size of C_full = ", Length@Subscript[C, full]]
 
 
-\[Epsilon] =10.^-4;
+\[Epsilon] =10.^-5;
 Subscript[\[ScriptCapitalA], 0]=ArrayFlatten[{{A,Transpose@B},{B,0.}}];
 Subscript[\[ScriptCapitalM], 0]=ArrayFlatten[{{ SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}],0.},{0.,Subscript[M, 0]}}];
 Subscript[\[ScriptCapitalA], full]=ArrayFlatten[{{A,Transpose@B},{B,-Subscript[C, full]}}];

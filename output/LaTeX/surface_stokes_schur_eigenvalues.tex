@@ -4,6 +4,16 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 
+\usepackage[dvipsnames, table]{xcolor}
+% links
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks,
+	linkcolor={Red!90!black},
+	citecolor={Red!90!black},
+	urlcolor={Red}
+}
+
 % sub figures / grids of pictures
 \usepackage{subcaption}
 \usepackage{graphicx}
@@ -30,6 +40,9 @@
 	includefoot, heightrounded
 }
 
+\newcommand{\sphere}{{\Gamma_{\text{sph}}}}
+\newcommand{\tor}{{\Gamma_{\text{tor}}}}
+
 \title{Some computational results for generalized pressure Schur complement eigenvalues of the surface Stokes problem}
 \author{
 	Alexander Zhiliakov\thanks{Department of Mathematics, University of Houston, Houston, Texas 77204 (alex@math.uh.edu).}
@@ -44,14 +57,14 @@
 
 \section{Bilinear forms and matrices}
 
+We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be the number of pressure d.o.f. Vector stiffness, gradient, and stabilization matrices resulting from Trace\,FEM discretization of the surface Stokes~\cite{surfstokes} problem are defined via
 \begin{align}
 	\langle \vect A\,\bar{\vect u}, \bar{\vect v} \rangle &= 
-		\int_{\Gamma} \big( E_s(\vect u_h) : E_s(\vect v_h) + \vect u_h\cdot\vect v_h + \tau\,u_{h,N}\,v_{h,N} \big) \diff{s} + 
-		\rho_u \int_{\Omega_h^{\Gamma}} ([\nabla\vect u_h]\,\hat{\vect n})\cdot([\nabla\vect v_h]\,\hat{\vect n}) \diff{\vect x}, \\
+		\int_{\Gamma} \big( E_s(\vect u) : E_s(\vect v) + \vect u\cdot\vect v + \tau\,u_N\,v_N \big) \diff{s} + 
+		\rho_u \int_{\Omega_h^{\Gamma}} ([\nabla\vect u]\,\hat{\vect n})\cdot([\nabla\vect v]\,\hat{\vect n}) \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
 	\langle \vect B\,\bar{\vect u}, \bar{\vect q} \rangle &= 
 \end{align}
-
-We set 
+respectively. We set 
 
 \section{Solution description}
 
@@ -79,13 +92,31 @@ Note: $h = 2.6\times10^{-2}$ for $\vect P_2$\,--\,$P_1$ (the last mesh level) wa
 		\includegraphicsw{lvl3.png}
 		\caption{$h = 2.08\times10^{-1}$}
 	\end{subfigure}
-	\caption{First three mesh levels for sphere}
+	\par
+	\begin{subfigure}{.33\linewidth}
+		\centering
+		\includegraphicsw{tor_lvl3.png}
+		\caption{$h = 2.08\times10^{-1}$}
+	\end{subfigure}%
+	\begin{subfigure}{.33\linewidth}
+		\centering
+		\includegraphicsw{tor_lvl4.png}
+		\caption{$h = 1.04\times10^{-1}$}
+	\end{subfigure}%
+	\begin{subfigure}{.33\linewidth}
+		\centering
+		\includegraphicsw{tor_lvl5.png}
+		\caption{$h = 5.21\times10^{-2}$}
+	\end{subfigure}
+	\caption{First three mesh levels for~$\sphere$ (top) and $\tor$ (bottom)}
 	\label{fig:sphere}		
 \end{figure}
 
+\clearpage
+
 \begin{table}[h!]
 	\centering
-	\caption{$\vect P_1$\,--\,$P_1$} 
+	\caption{$\vect P_1$\,--\,$P_1$ for $\sphere$} 
 	\label{tab:p1p1}
 	\small
 	\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
@@ -94,19 +125,18 @@ Note: $h = 2.6\times10^{-2}$ for $\vect P_2$\,--\,$P_1$ (the last mesh level) wa
 		\cline{4-9}
 		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
 		\hline
-		\input{P1P1_table.tex}
-		\hline
+		\input{sphere_2_P1P1_table.tex}
 		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 		\cline{4-9}
 		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
 		\hline
-		\input{P1P1_res_table.tex}
+		\input{sphere_2_P1P1_res_table.tex}
 	\end{tabular}
 \end{table}
 
 \begin{table}[h!]
 	\centering
-	\caption{$\vect P_2$\,--\,$P_1$} 
+	\caption{$\vect P_2$\,--\,$P_1$ for $\sphere$} 
 	\label{tab:p2p1}
 	\small
 	\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
@@ -115,14 +145,56 @@ Note: $h = 2.6\times10^{-2}$ for $\vect P_2$\,--\,$P_1$ (the last mesh level) wa
 		\cline{4-9}
 		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
 		\hline
-		\input{P2P1_table.tex}
-		\hline
+		\input{sphere_2_P2P1_table.tex}
 		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 		\cline{4-9}
 		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
 		\hline
-		\input{P2P1_res_table.tex}
+		\input{sphere_2_P2P1_res_table.tex}
 	\end{tabular}
 \end{table}
+
+\begin{table}[h!]
+	\centering
+	\caption{$\vect P_1$\,--\,$P_1$ for $\tor$} 
+	\label{tab:p1p1_tor}
+	\small
+	\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+		\cline{4-9}
+		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+		\hline
+		\input{torus_P1P1_table.tex}
+		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+		\cline{4-9}
+		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
+		\hline
+		\input{torus_P1P1_res_table.tex}
+	\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\caption{$\vect P_2$\,--\,$P_1$ for $\tor$} 
+	\label{tab:p2p1_tor}
+	\small
+	\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+		\cline{4-9}
+		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+		\hline
+		\input{torus_P2P1_table.tex}
+		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+		\cline{4-9}
+		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
+		\hline
+		\input{torus_P2P1_res_table.tex}
+	\end{tabular}
+\end{table}
+
+\bibliographystyle{plain}
+\bibliography{bibl}
 
 \end{document}

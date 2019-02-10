@@ -347,6 +347,8 @@ TSWLatexianTemp*
 
 # End of https://www.gitignore.io/api/clion,latex
 
+MKL_Eigs_for_Sparse_Matrices
+
 stdin.txt
 output/tg.txt
 
