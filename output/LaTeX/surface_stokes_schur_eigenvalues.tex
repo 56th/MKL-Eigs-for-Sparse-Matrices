@@ -14,6 +14,14 @@
 	urlcolor={Red}
 }
 
+\usepackage{geometry}
+\newgeometry{
+	left=1cm, right=1cm, top=1cm, bottom=1cm,
+	includefoot, heightrounded
+}
+
+\usepackage[parfill]{parskip} % https://tex.stackexchange.com/a/16703/135296
+
 % sub figures / grids of pictures
 \usepackage{subcaption}
 \usepackage{graphicx}
@@ -34,12 +42,7 @@
 \newcommand*\diff{\mathop{}\!\mathrm{d}}
 \newcommand*\Diff[1]{\mathop{}\!\mathrm{d^#1}}
 
-\usepackage{geometry}
-\newgeometry{
-	left=1cm, right=1cm, top=1cm, bottom=1cm,
-	includefoot, heightrounded
-}
-
+\DeclareMathOperator{\Div}{div}
 \newcommand{\sphere}{{\Gamma_{\text{sph}}}}
 \newcommand{\tor}{{\Gamma_{\text{tor}}}}
 
@@ -57,16 +60,46 @@
 
 \section{Bilinear forms and matrices}
 
-We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be the number of pressure d.o.f. Vector stiffness, gradient, and stabilization matrices resulting from Trace\,FEM discretization of the surface Stokes~\cite{surfstokes} problem are defined via
+We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be the number of pressure d.o.f. Vector stiffness, divergence, pressure mass, normal stabilization, and full stabilization matrices resulting from Trace\,FEM discretization of the surface Stokes problem~\cite{surfstokes} are defined via
 \begin{align}
 	\langle \vect A\,\bar{\vect u}, \bar{\vect v} \rangle &= 
 		\int_{\Gamma} \big( E_s(\vect u) : E_s(\vect v) + \vect u\cdot\vect v + \tau\,u_N\,v_N \big) \diff{s} + 
 		\rho_u \int_{\Omega_h^{\Gamma}} ([\nabla\vect u]\,\hat{\vect n})\cdot([\nabla\vect v]\,\hat{\vect n}) \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
 	\langle \vect B\,\bar{\vect u}, \bar{\vect q} \rangle &= 
+		-\int_{\Gamma} q\,\Div_{\Gamma} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
+	\langle \vect M_0\,\bar{\vect p}, \bar{\vect q} \rangle &=
+		\int_{\Gamma} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_n\,\bar{\vect p}, \bar{\vect q} \rangle &=
+		\rho_p \int_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\hat{\vect n}} \frac{\partial q}{\partial\hat{\vect n}} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_{\text{full}}\,\bar{\vect p}, \bar{\vect q} \rangle &=
+		\rho_p \int_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},		 
 \end{align}
-respectively. We set 
+respectively. Here~$\bar{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\bar{\vect p}$ and $p$). Mesh-dependent parameters are set as
+\begin{equation}
+	\tau = h^{-2}, \quad \rho_u = \rho_p = h,
+\end{equation}
+and $h$ is the mesh size of~$\Omega^{\Gamma}_h$. $\Gamma$ is chosen either as the unit sphere or torus, $\Gamma = \sphere$ or $\Gamma = \tor$ (see Figure~\ref{fig:gamma}).
+
+We also define matrices 
+\begin{align}
+	\vect M_n &\coloneqq \vect M_0 + \vect C_n,\\
+	\vect M_{\text{full}} &\coloneqq \vect M_0 + \vect C_{\text{full}}.
+\end{align}
+We are interested in (generalized) extreme eigenvalues of the pressure Schur complement matrices
+\begin{align}
+	\vect S_0 &\coloneqq \vect B\,\vect A^{-1}\,\vect B^{T},\\
+	\vect S_n &\coloneqq \vect S_0 + \vect C_n,\\
+	\vect S_{\text{full}} &\coloneqq \vect S_0 + \vect C_{\text{full}},
+\end{align}
+i.e. in solving
+\begin{equation}\label{problem}
+	\vect S_\star\,\vect x = \lambda\,\vect M_\star\,\vect x,
+\end{equation}
+where ``$\star$'' stands for ``$0$'', ``$n$'' or ``full.'' We denote by~$0 = \lambda_1 < \lambda_2 \le \dots \le \lambda_{n_{\vect S}} = O(1)$ the spectrum of~\eqref{problem}.
 
 \section{Solution description}
+
+(TBA)
 
 $n_{\vect A}$ is the number of velocity d.o.f, $n_{\vect S}$ is the number of pressure d.o.f., $0 = \lambda_1 < \lambda_2 \le \dots \le \lambda_{n_{\vect S}}$ is the (approximate) spectrum of~$\vect S$, and $r_i$ are the residual norm, i.e.
 $$
@@ -109,7 +142,7 @@ Note: $h = 2.6\times10^{-2}$ for $\vect P_2$\,--\,$P_1$ (the last mesh level) wa
 		\caption{$h = 5.21\times10^{-2}$}
 	\end{subfigure}
 	\caption{First three mesh levels for~$\sphere$ (top) and $\tor$ (bottom)}
-	\label{fig:sphere}		
+	\label{fig:gamma}		
 \end{figure}
 
 \clearpage
