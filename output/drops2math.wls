@@ -28,13 +28,13 @@ Print["size of C_n    = ", Length@Subscript[C, n]]
 Print["size of C_full = ", Length@Subscript[C, full]]
 
 
-\[Epsilon] =10.^-5;
+\[Epsilon] =10.^-6;
 Subscript[\[ScriptCapitalA], 0]=ArrayFlatten[{{A,Transpose@B},{B,0.}}];
-Subscript[\[ScriptCapitalM], 0]=ArrayFlatten[{{ SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}],0.},{0.,Subscript[M, 0]}}];
+Subscript[\[ScriptCapitalM], 0]=ArrayFlatten[{{ \[Epsilon] A(*SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}]*), 0.},{0.,Subscript[M, 0]}}];
 Subscript[\[ScriptCapitalA], full]=ArrayFlatten[{{A,Transpose@B},{B,-Subscript[C, full]}}];
-Subscript[\[ScriptCapitalM], full]=ArrayFlatten[{{ SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}],0.},{0.,Subscript[M, 0]+Subscript[C, full]}}];
+Subscript[\[ScriptCapitalM], full]=ArrayFlatten[{{ \[Epsilon] A(*SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}]*),0.},{0.,Subscript[M, 0]+Subscript[C, full]}}];
 Subscript[\[ScriptCapitalA], n]=ArrayFlatten[{{A,Transpose@B},{B,-Subscript[C, n]}}];
-Subscript[\[ScriptCapitalM], n]=ArrayFlatten[{{ SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}],0.},{0.,Subscript[M, 0]+Subscript[C, n]}}];
+Subscript[\[ScriptCapitalM], n]=ArrayFlatten[{{ \[Epsilon] A(*SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}]*),0.},{0.,Subscript[M, 0]+Subscript[C, n]}}];
 
 
 format="mtx";
