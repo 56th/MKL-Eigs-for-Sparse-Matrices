@@ -39,6 +39,6 @@ Subscript[\[ScriptCapitalM], n]=ArrayFlatten[{{ \[Epsilon] A(*SparseArray[{{i_,i
 
 format="mtx";
 Print@Export[oDir<>"size.txt", <|"nA"->Subscript[n, A],"nS"->Subscript[n, S]|>]
-Print[Export[oDir<>"A_block_0."<>format,Subscript[\[ScriptCapitalA], 0]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_0."<>format,Subscript[\[ScriptCapitalM], 0]]]
-Print[Export[oDir<>"A_block_full."<>format,Subscript[\[ScriptCapitalA], full]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_full."<>format,Subscript[\[ScriptCapitalM], full]]]
-Print[Export[oDir<>"A_block_n."<>format,Subscript[\[ScriptCapitalA], n]]<>" "<>Export[oDir<>"eps="<>ToString@\[Epsilon]<>"_M_block_n."<>format,Subscript[\[ScriptCapitalM], n]]]
+Print[Export[oDir<>"A_block_0."<>format,Subscript[\[ScriptCapitalA], 0]]<>" "<>Export[oDir<>"eps="<>ToString@DecimalForm@\[Epsilon]<>"_M_block_0."<>format,Subscript[\[ScriptCapitalM], 0]]]
+Print[Export[oDir<>"A_block_full."<>format,Subscript[\[ScriptCapitalA], full]]<>" "<>Export[oDir<>"eps="<>ToString@DecimalForm@\[Epsilon]<>"_M_block_full."<>format,Subscript[\[ScriptCapitalM], full]]]
+Print[Export[oDir<>"A_block_n."<>format,Subscript[\[ScriptCapitalA], n]]<>" "<>Export[oDir<>"eps="<>ToString@DecimalForm@\[Epsilon]<>"_M_block_n."<>format,Subscript[\[ScriptCapitalM], n]]]
