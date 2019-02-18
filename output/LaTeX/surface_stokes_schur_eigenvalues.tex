@@ -100,17 +100,17 @@ where ``$\star$'' stands for ``$0$,'' ``$n$,'' or ``full.'' We denote by~$0 = \l
 
 \section{Solution description}
 
-Computing $\vect A^{-1}$ in~\eqref{schur} becomes troublesome already for $h = 5.21\times10^{-2}$ ($n_{\vect A} = 32736$ for $\vect u \in \vect P_1$ FE space): although $\vect A$ is sparse, $\vect A^{-1}$ is dense and consumes 8.5+ GB in double-precision arithmetic. A quick research \href{https://mathematica.stackexchange.com/questions/189620/matrix-free-arnoldi-method-for-eigensystems}{showed} that \texttt{Mathematica} has no built-in matrix-free eigenvalue routines. \texttt{Intel MKL}'s FEAST algorithm for computing (generalized) eigenvalues in an interval \href{https://software.intel.com/sites/default/files/mkl-2019-developer-reference-c.pdf#_OPENTOPIC_TOC_PROCESSING_d62e853651}{is suitable for matrix-free implementations}; however, it requires some expensive operations to be implemented (e.g. matrix-matrix multiplications $\vect S_\star\,\vect X \leftarrow \vect Y$, $\vect M_\star\,\vect X \leftarrow \vect Y$ and approximating the action of inverses in the form $(\sigma\,\vect M_\star - \vect S_\star)^{-1}\,\vect x \leftarrow \vect y$).
+Computing $\vect A^{-1}$ in~\eqref{schur} becomes troublesome already for $h = 5.21\times10^{-2}$ ($n_{\vect A} = 32736$ for $\vect u \in \vect P_1$ FE space): although $\vect A$ is sparse, $\vect A^{-1}$ is dense and consumes 8.5+ GB in double-precision arithmetic. A quick research \href{https://mathematica.stackexchange.com/questions/189620/matrix-free-arnoldi-method-for-eigensystems}{showed} that \texttt{Mathematica} has no built-in matrix-free eigenvalue routines. \texttt{Intel MKL}'s FEAST algorithm for computing (generalized) eigenvalues in an interval \href{https://software.intel.com/sites/default/files/mkl-2019-developer-reference-c.pdf#_OPENTOPIC_TOC_PROCESSING_d62e853651}{is suitable for matrix-free implementations}; however, it requires some expensive operations to be implemented (e.g. matrix-matrix multiplications $\vect S_\star\,\vect X \leftarrow \vect Y$, $\vect M_\star\,\vect X \rightarrow \vect Y$ and approximating the action of inverses in the form $(\sigma\,\vect M_\star - \vect S_\star)^{-1}\,\vect x \rightarrow \vect y$).
 
 Taking this into account, instead of~\eqref{problem} we consider a perturbed\footnotemark{} problem
 \begin{equation}\label{problem_pert}
 	\underbrace{\begin{bmatrix}
-		\vect A & \vect B^T \\
-		\vect B & \vect C_\star \\
+		\vect A & \phantom{-}\vect B^T \\
+		\vect B & -\vect C_\star \\
 	\end{bmatrix}}_{\mathcal A_\star \coloneqq}
 	\begin{bmatrix}
-		\vect u \\
-		\vect p
+		\vect x \\
+		\vect y
 	\end{bmatrix}
 	=
 	\mu
@@ -119,8 +119,8 @@ Taking this into account, instead of~\eqref{problem} we consider a perturbed\foo
 		& \vect M_\star
 	\end{bmatrix}}_{\mathcal M^\epsilon_\star \coloneqq}
 	\begin{bmatrix}
-		\vect u \\
-		\vect p
+		\vect x \\
+		\vect y
 	\end{bmatrix}
 \end{equation}
 with $0 < \epsilon \ll 1$. For $\mathcal A_0$ and $\mathcal M^\epsilon_0$ we have
