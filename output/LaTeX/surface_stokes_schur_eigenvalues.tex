@@ -16,7 +16,7 @@
 
 \usepackage{geometry}
 \newgeometry{
-	left=1cm, right=1cm, top=1cm, bottom=1cm,
+	left=1cm, right=1cm, top=.8cm, bottom=.8cm,
 	includefoot, heightrounded
 }
 
@@ -61,7 +61,7 @@
 \section{Bilinear forms and matrices}
 
 We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be the number of pressure d.o.f. Vector stiffness, divergence, pressure mass, normal stabilization, and full stabilization matrices resulting from Trace\,FEM discretization of the surface Stokes problem~\cite{surfstokes} are defined via
-\begin{align}\begin{split}
+\begin{align}\begin{split}\label{mtx}
 	\langle \vect A\,\bar{\vect u}, \bar{\vect v} \rangle &= 
 		\int_{\Gamma} \big( E_s(\vect u) : E_s(\vect v) + \vect u\cdot\vect v + \tau\,u_N\,v_N \big) \diff{s} + 
 		\rho_u \int_{\Omega_h^{\Gamma}} ([\nabla\vect u]\,\hat{\vect n})\cdot([\nabla\vect v]\,\hat{\vect n}) \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
@@ -74,11 +74,11 @@ We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be
 	\langle \vect C_{\text{full}}\,\bar{\vect p}, \bar{\vect q} \rangle &=
 		\rho_p \int_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},		 
 \end{split}\end{align}
-respectively. Here~$\bar{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\bar{\vect p}$ and $p$). Mesh-dependent parameters are set as
+respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega_\Gamma^h$ is the domain consisting of tetrahedra cut by $\Gamma$. Here~$\bar{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\bar{\vect p}$ and $p$). Mesh-dependent parameters are set as
 \begin{equation}
 	\tau = h^{-2}, \quad \rho_u = \rho_p = h,
 \end{equation}
-and $h$ is the mesh size of~$\Omega^{\Gamma}_h$. $\Gamma$ is chosen either as the unit sphere or torus, $\Gamma = \sphere$ or $\Gamma = \tor$ (see Figure~\ref{fig:gamma}).
+and $h$ is the typical mesh size for tetrahedra from~$\Omega^{\Gamma}_h$. $\Gamma$ is chosen either as the unit sphere or torus, $\Gamma = \sphere$ or $\Gamma = \tor$ (see Figure~\ref{fig:gamma}).
 
 We also define matrices 
 \begin{align}\begin{split}
@@ -127,10 +127,14 @@ with $0 < \epsilon \ll 1$. For $\mathcal A_0$ and $\mathcal M^\epsilon_0$ we hav
 \begin{equation}
 	\mu = -\lambda + o(1)\quad\text{or}\quad\epsilon^{-1} + \lambda + o(1),\qquad\epsilon \rightarrow 0.
 \end{equation}
-This makes it easy to pick only ``correct'' eigenvalues. To make sure that results are consistent we solved~\eqref{problem_pert} for~$\epsilon = 10^{-5}$ and~$\epsilon = 10^{-6}$.
+This makes it easy to pick only ``correct'' eigenvalues. To ease the computation further we replace the $(1, 1)$-block of~$\mathcal M^\epsilon_\star$ with $\epsilon\,\vect I$. 
+
+To make sure that results are consistent we solve~\eqref{problem_pert} for~$\epsilon = 10^{-5}$ and~$\epsilon = 10^{-6}$; for the coarse mesh levels we also check that the direct solution of~\eqref{problem} and the iterative one for~\eqref{problem_pert} coincide.  
 
 \footnotetext{The majority of generalized eigenvalue solvers require left-hand-side matrix to be Hermitian and right-hand-side matrix to be Hermitian \textbf{positive definite}; that's why we need to introduce $\epsilon > 0$.}     
-	
+
+\section{Numerical results: dependency of the spectrum on the mesh size}
+
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}{.33\linewidth}
@@ -170,121 +174,129 @@ This makes it easy to pick only ``correct'' eigenvalues. To make sure that resul
 
 \clearpage
 
-\begin{table}[h!]
-	\centering
-	\caption{$\vect P_1$\,--\,$P_1$ for $\sphere$} 
+\begin{table}[h]
+	\centering\small
+	\caption{Spectrum of~\eqref{problem} for $\vect P_1$\,--\,$P_1$} 
 	\label{tab:p1p1}
-	\small
-	\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
-		\hline
-		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-		\cline{4-9}
-		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-		\hline
-		\input{sphere_2_P1P1_table.tex}
-%		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%		\cline{4-9}
-%		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
-%		\hline
-%		\input{sphere_2_P1P1_res_table.tex}
-	\end{tabular}
-\end{table}
-\begin{table}[h!]
-	\centering
-	\caption{$\vect P_1$\,--\,$P_1$ for $\tor$} 
-	\label{tab:p1p1_tor}
-	\small
-	\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
-		\hline
-		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-		\cline{4-9}
-		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-		\hline
-		\input{torus_P1P1_table.tex}
-		%		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-		%		\cline{4-9}
-		%		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
-		%		\hline
-		%		\input{torus_P1P1_res_table.tex}
-	\end{tabular}
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\caption{$\Gamma = \sphere$}
+		\label{tab:p1p1:sph}
+		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+			\hline
+			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{4-9}
+			& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{sphere_2_P1P1_table.tex}
+			%		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			%		\cline{4-9}
+			%		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
+			%		\hline
+			%		\input{torus_P1P1_res_table.tex}
+		\end{tabular}
+	\end{subtable}%
+	\vskip 3mm
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\caption{$\Gamma = \tor$}
+		\label{tab:p1p1:tor}
+		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+			\hline
+			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{4-9}
+			& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{torus_P1P1_table.tex}
+			%		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			%		\cline{4-9}
+			%		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
+			%		\hline
+			%		\input{torus_P1P1_res_table.tex}
+		\end{tabular}
+	\end{subtable}
 \end{table}
 \vfill
 \begin{figure}[h]
-	\centering
+	\centering\small
 	\begin{subfigure}{.49\linewidth}
 		\centering
 		\includegraphicsw{sphere_2_P1P1.png}
-		\caption{$\vect P_1$\,--\,$P_1$ for $\sphere$}
+		%\caption{$\vect P_1$\,--\,$P_1$ for $\sphere$}
 	\end{subfigure}%
 	\hfill
 	\begin{subfigure}{.49\linewidth}
 		\centering
 		\includegraphicsw{torus_P1P1.png}
-		\caption{$\vect P_1$\,--\,$P_1$ for $\tor$}
+		%\caption{$\vect P_1$\,--\,$P_1$ for $\tor$}
 	\end{subfigure}
+	\caption{Log-log plot of~$\lambda_2$ for Tables~\ref{tab:p1p1}\subref{tab:p1p1:sph} (left) and~\ref{tab:p1p1}\subref{tab:p1p1:tor} (right)}
 \end{figure}
 \vfill
 
 \clearpage
 
-\begin{table}[h!]
-	\centering
-	\caption{$\vect P_2$\,--\,$P_1$ for $\sphere$} 
+\clearpage
+
+\begin{table}[h]
+	\centering\small
+	\caption{Spectrum of~\eqref{problem} for $\vect P_2$\,--\,$P_1$} 
 	\label{tab:p2p1}
-	\small
-	\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
-		\hline
-		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-		\cline{4-9}
-		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-		\hline
-		\input{sphere_2_P2P1_table.tex}
-%		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%		\cline{4-9}
-%		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
-%		\hline
-%		\input{sphere_2_P2P1_res_table.tex}
-	\end{tabular}
-\end{table}
-\begin{table}[h!]
-	\centering
-	\caption{$\vect P_2$\,--\,$P_1$ for $\tor$} 
-	\label{tab:p2p1_tor}
-	\small
-	\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
-		\hline
-		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-		\cline{4-9}
-		& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-		\hline
-		\input{torus_P2P1_table.tex}
-%		\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%		\cline{4-9}
-%		& & & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ & $r_2$ & $r_{n_{\vect S}}$ \\ 
-%		\hline
-%		\input{torus_P2P1_res_table.tex}
-	\end{tabular}
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\caption{$\Gamma = \sphere$}
+		\label{tab:p2p1:sph}
+		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+			\hline
+			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{4-9}
+			& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{sphere_2_P2P1_table.tex}
+		\end{tabular}
+	\end{subtable}%
+	\vskip 3mm
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\caption{$\Gamma = \tor$}
+		\label{tab:p2p1:tor}
+		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+			\hline
+			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{4-9}
+			& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{torus_P2P1_table.tex}
+		\end{tabular}
+	\end{subtable}
 \end{table}
 \vfill
 \begin{figure}[h]
-	\centering
+	\centering\small
 	\begin{subfigure}{.49\linewidth}
 		\centering
 		\includegraphicsw{sphere_2_P2P1.png}
-		\caption{$\vect P_2$\,--\,$P_1$ for $\sphere$}
 	\end{subfigure}%
 	\hfill
 	\begin{subfigure}{.49\linewidth}
 		\centering
 		\includegraphicsw{torus_P2P1.png}
-		\caption{$\vect P_2$\,--\,$P_1$ for $\tor$}
-	\end{subfigure}	
+	\end{subfigure}
+	\caption{Log-log plot of~$\lambda_2$ for Tables~\ref{tab:p2p1}\subref{tab:p2p1:sph} (left) and~\ref{tab:p2p1}\subref{tab:p2p1:tor} (right)}
 \end{figure}
 \vfill
 
 \clearpage
 
-\section{Numerical results: levelset shifts}
+\section{Numerical results: sensitivity of the spectrum to levelset shifts}
+
+In this section we investigate the sensitivity of the spectrum to levelset shifts
+\begin{equation}\label{shift}
+	\Gamma \mapsto \Gamma + \alpha\,\vect s,
+\end{equation}
+for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$. 
+
+We construct the bulk mesh~$\Omega_h^\Gamma$ and then perform the assembly of matrices~\eqref{mtx} using the shifted levelset~\eqref{shift}. That is, the refinement of~$\Omega_h^\Gamma$ is performed using~$\Gamma$, not~$\Gamma + \alpha\,\vect s$, and~$\Omega_h^{\Gamma + \alpha\,\vect s}$ is never constructed. We choose $\alpha \in [0, h]$ to guarantee the appearance of ``small cuts'' in~$\Omega_h^\Gamma$.
 
 \begin{figure}[h]
 	\centering
@@ -298,11 +310,11 @@ This makes it easy to pick only ``correct'' eigenvalues. To make sure that resul
 		\includegraphicsw{{shift_0.2}.png}
 		\caption{$\sphere + \alpha\,\vect s$}
 	\end{subfigure}%
-	\caption{The unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (0, 1, 1)^T$, $\alpha = 0.2\,/\,\|\vect s\|$, and $h = 2.08\times10^{-1}$. The bulk mesh~$\Omega_\Gamma^h$ is computed for~$\sphere$ and then used for~$\sphere + \alpha\,\vect s$}
+	\caption{The unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (0, 1, 1)^T/\sqrt{2}$, $\alpha = 0.2$, and $h = 2.08\times10^{-1}$. The bulk mesh~$\Omega_\Gamma^h$ is computed for~$\sphere$ and then used for~$\sphere + \alpha\,\vect s$}
 	\label{fig:shift}		
 \end{figure}
 
-\begin{table}[h!]
+\begin{table}[h]
 	\centering
 	\caption{Spectrum of~\eqref{problem} for perturbed levelset $\sphere + \alpha\,\vect s$. Here $\vect s = (1, 1, 1)^T/\sqrt{3}$, $h = 1.04\times10^{-1}$} 
 	\label{tab:p1p1_shift_h=0.104167}
@@ -329,10 +341,12 @@ This makes it easy to pick only ``correct'' eigenvalues. To make sure that resul
 			\cline{2-7}
 			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
 			\hline
-			\input{sphere_2_P1P1_h=0.104167_table.tex}
+			\input{sphere_2_P2P1_h=0.104167_table.tex}
 		\end{tabular}%
 	\end{subtable}
 \end{table}
+
+\clearpage
 
 \bibliographystyle{plain}
 \bibliography{bibl}
