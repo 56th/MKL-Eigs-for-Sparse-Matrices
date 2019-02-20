@@ -33,11 +33,11 @@ Print["size of C_full = ", Length@Cfull]
 
 eps = 10.^-6;
 ABLOCK0 = ArrayFlatten[{{A, Transpose@B}, {B, 0.}}];
-MBLOCK0 = ArrayFlatten[{{ eps A(*SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}]*), 0.}, {0., M0}}];
+MBLOCK0 = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}](*eps A*), 0.}, {0., M0}}];
 ABLOCKn = ArrayFlatten[{{A, Transpose@B}, {B, -Cn}}];
-MBLOCKn = ArrayFlatten[{{eps A(*SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}]*), 0.}, {0., M0 + Cn}}];
+MBLOCKn = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}](*eps A*), 0.}, {0., M0 + Cn}}];
 ABLOCKfull = ArrayFlatten[{{A, Transpose@B}, {B, -Cfull}}];
-MBLOCKfull = ArrayFlatten[{{eps A(*SparseArray[{{i_,i_}->\[Epsilon]},{Subscript[n, A],Subscript[n, A]}]*), 0.}, {0., M0 + Cfull}}];
+MBLOCKfull = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}](*eps A*), 0.}, {0., M0 + Cfull}}];
 Print["max memory used:  ", ToString@TeXForm@ScientificForm[MaxMemoryUsed[] * 10.^-6, 3], " MB"];
 Print["memory available: ", ToString@TeXForm@ScientificForm[MemoryAvailable[] * 10.^-6, 3], " MB"];
 Print[""];

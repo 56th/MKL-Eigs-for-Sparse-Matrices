@@ -11,7 +11,7 @@
 	colorlinks,
 	linkcolor={Red!90!black},
 	citecolor={Red!90!black},
-	urlcolor={Red}
+	urlcolor={blue}
 }
 
 \usepackage{geometry}
@@ -100,7 +100,7 @@ where ``$\star$'' stands for ``$0$,'' ``$n$,'' or ``full.'' We denote by~$0 = \l
 
 \section{Solution description}
 
-Computing $\vect A^{-1}$ in~\eqref{schur} becomes troublesome already for $h = 5.21\times10^{-2}$ ($n_{\vect A} = 32736$ for $\vect u \in \vect P_1$ FE space): although $\vect A$ is sparse, $\vect A^{-1}$ is dense and consumes 8.5+ GB in double-precision arithmetic. A quick research \href{https://mathematica.stackexchange.com/questions/189620/matrix-free-arnoldi-method-for-eigensystems}{showed} that \texttt{Mathematica} has no built-in matrix-free eigenvalue routines. \texttt{Intel MKL}'s FEAST algorithm for computing (generalized) eigenvalues in an interval \href{https://software.intel.com/sites/default/files/mkl-2019-developer-reference-c.pdf#_OPENTOPIC_TOC_PROCESSING_d62e853651}{is suitable for matrix-free implementations}; however, it requires some expensive operations to be implemented (e.g. matrix-matrix multiplications $\vect S_\star\,\vect X \leftarrow \vect Y$, $\vect M_\star\,\vect X \rightarrow \vect Y$ and approximating the action of inverses in the form $(\sigma\,\vect M_\star - \vect S_\star)^{-1}\,\vect x \rightarrow \vect y$).
+Computing $\vect A^{-1}$ in~\eqref{schur} becomes troublesome already for $h = 5.21\times10^{-2}$ ($n_{\vect A} = 32736$ for $\vect u \in \vect P_1$ FE space): although $\vect A$ is sparse, $\vect A^{-1}$ is dense and consumes 8.5+ GB in double-precision arithmetic. A quick research \href{https://mathematica.stackexchange.com/questions/189620/matrix-free-arnoldi-method-for-eigensystems}{showed} that \texttt{Mathematica} has no built-in matrix-free eigenvalue routines. \texttt{Intel MKL}'s FEAST algorithm for computing (generalized) eigenvalues in an interval \href{https://software.intel.com/sites/default/files/mkl-2019-developer-reference-c.pdf#_OPENTOPIC_TOC_PROCESSING_d62e853651}{is suitable for matrix-free implementations}; however, it requires some expensive operations to be implemented (e.g. matrix-matrix multiplications $\vect Y \leftarrow \vect S_\star\,\vect X$, $\vect Y \leftarrow \vect M_\star\,\vect X$ and approximating the action of inverses in the form $\vect y \leftarrow (\sigma\,\vect M_\star - \vect S_\star)^{-1}\,\vect x$).
 
 Taking this into account, instead of~\eqref{problem} we consider a perturbed\footnotemark{} problem
 \begin{equation}\label{problem_pert}
@@ -283,6 +283,56 @@ This makes it easy to pick only ``correct'' eigenvalues. To make sure that resul
 \vfill
 
 \clearpage
+
+\section{Numerical results: levelset shifts}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw{{shift_0.0}.png}
+		\caption{$\sphere$}
+	\end{subfigure}%
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw{{shift_0.2}.png}
+		\caption{$\sphere + \alpha\,\vect s$}
+	\end{subfigure}%
+	\caption{The unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (0, 1, 1)^T$, $\alpha = 0.2\,/\,\|\vect s\|$, and $h = 2.08\times10^{-1}$. The bulk mesh~$\Omega_\Gamma^h$ is computed for~$\sphere$ and then used for~$\sphere + \alpha\,\vect s$}
+	\label{fig:shift}		
+\end{figure}
+
+\begin{table}[h!]
+	\centering
+	\caption{Spectrum of~\eqref{problem} for perturbed levelset $\sphere + \alpha\,\vect s$. Here $\vect s = (1, 1, 1)^T/\sqrt{3}$, $h = 1.04\times10^{-1}$} 
+	\label{tab:p1p1_shift_h=0.104167}
+	\small
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\caption{$\vect P_1$\,--\,$P_1$}
+		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|}
+			\hline
+			\multirow{2}{*}{Surface} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{2-7}
+			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{sphere_2_P1P1_h=0.104167_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 4mm
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\caption{$\vect P_2$\,--\,$P_1$}
+		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|}
+			\hline
+			\multirow{2}{*}{Surface} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{2-7}
+			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{sphere_2_P1P1_h=0.104167_table.tex}
+		\end{tabular}%
+	\end{subtable}
+\end{table}
 
 \bibliographystyle{plain}
 \bibliography{bibl}
