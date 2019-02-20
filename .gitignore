@@ -352,6 +352,4 @@ MKL_Eigs_for_Sparse_Matrices
 stdin.txt
 output/tg.txt
 
-h=*
-!h=0.833332_*
-!h=0.416666_*
+*.mtx
