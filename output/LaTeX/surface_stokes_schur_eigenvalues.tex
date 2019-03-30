@@ -46,6 +46,19 @@
 \newcommand{\sphere}{{\Gamma_{\text{sph}}}}
 \newcommand{\tor}{{\Gamma_{\text{tor}}}}
 
+\usepackage{listings}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\lstset{
+	language=C++,
+	basicstyle=\footnotesize\ttfamily,
+	breaklines=true,
+	commentstyle=\color{mygreen},
+	frame=l,
+	xleftmargin=5pt,
+	tabsize=2,
+	belowskip=-1pt
+} 
+
 \title{Some computational results for generalized pressure Schur complement eigenvalues of the surface Stokes problem}
 \author{
 	Alexander Zhiliakov\thanks{Department of Mathematics, University of Houston, Houston, Texas 77204 (alex@math.uh.edu).}
@@ -62,19 +75,19 @@
 
 We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be the number of pressure d.o.f. Vector stiffness, divergence, pressure mass, normal stabilization, and full stabilization matrices resulting from Trace\,FEM discretization of the surface Stokes problem~\cite{surfstokes} are defined via
 \begin{align}\begin{split}\label{mtx}
-	\langle \vect A\,\bar{\vect u}, \bar{\vect v} \rangle &= 
-		\int_{\Gamma} \big( E_s(\vect u) : E_s(\vect v) + \vect u\cdot\vect v + \tau\,u_N\,v_N \big) \diff{s} + 
-		\rho_u \int_{\Omega_h^{\Gamma}} ([\nabla\vect u]\,\hat{\vect n})\cdot([\nabla\vect v]\,\hat{\vect n}) \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
-	\langle \vect B\,\bar{\vect u}, \bar{\vect q} \rangle &= 
+	\langle \vect A\,\bar{\vect u}, \bar{\vect v} \rangle &\approx 
+		\int_{\Gamma} \big( E_s(\vect u) : E_s(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n)\,(\vect v\cdot\vect n) \big) \diff{s} + 
+		\rho_u \int_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n}\cdot\frac{\partial \vect v}{\partial\vect n} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
+	\langle \vect B\,\bar{\vect u}, \bar{\vect q} \rangle &\approx 
 		-\int_{\Gamma} q\,\Div_{\Gamma} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
-	\langle \vect M_0\,\bar{\vect p}, \bar{\vect q} \rangle &=
+	\langle \vect M_0\,\bar{\vect p}, \bar{\vect q} \rangle &\approx
 		\int_{\Gamma} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
-	\langle \vect C_n\,\bar{\vect p}, \bar{\vect q} \rangle &=
-		\rho_p \int_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\hat{\vect n}} \frac{\partial q}{\partial\hat{\vect n}} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
-	\langle \vect C_{\text{full}}\,\bar{\vect p}, \bar{\vect q} \rangle &=
+	\langle \vect C_n\,\bar{\vect p}, \bar{\vect q} \rangle &\approx
+		\rho_p \int_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\vect n} \frac{\partial q}{\partial\vect n} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_{\text{full}}\,\bar{\vect p}, \bar{\vect q} \rangle &\approx
 		\rho_p \int_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},		 
 \end{split}\end{align}
-respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega_\Gamma^h$ is the domain consisting of tetrahedra cut by $\Gamma$. Here~$\bar{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\bar{\vect p}$ and $p$). Mesh-dependent parameters are set as
+respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega_\Gamma^h$ is the domain consisting of tetrahedra cut by $\Gamma$. Here~$\bar{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\bar{\vect p}$ and $p$). See~\eqref{mtx_exact} for the computational details. Mesh-dependent parameters are set as
 \begin{equation}
 	\tau = h^{-2}, \quad \rho_u = \rho_p = h,
 \end{equation}
@@ -129,7 +142,7 @@ with $0 < \epsilon \ll 1$. For $\mathcal A_0$ and $\mathcal M^\epsilon_0$ we hav
 \end{equation}
 This makes it easy to pick only ``correct'' eigenvalues. To ease the computation further we replace the $(1, 1)$-block of~$\mathcal M^\epsilon_\star$ with $\epsilon\,\vect I$. 
 
-To make sure that results are consistent we solve~\eqref{problem_pert} for~$\epsilon = 10^{-5}$ and~$\epsilon = 10^{-6}$; for the coarse mesh levels we also check that the direct solution of~\eqref{problem} and the iterative one for~\eqref{problem_pert} coincide.  
+To make sure that results are consistent we solve~\eqref{problem_pert} for~$\epsilon = 10^{-5}$ and~$\epsilon = 10^{-6}$; for the coarse mesh levels we also check that the dense solver for~\eqref{problem} and the iterative one for~\eqref{problem_pert} give solutions that coincide.  
 
 \footnotetext{The majority of generalized eigenvalue solvers require left-hand-side matrix to be Hermitian and right-hand-side matrix to be Hermitian \textbf{positive definite}; that's why we need to introduce $\epsilon > 0$.}     
 
@@ -347,6 +360,176 @@ We construct the bulk mesh~$\Omega_h^\Gamma$ and then perform the assembly of ma
 \end{table}
 
 \clearpage
+
+\section{Notes on DROPS implementation}
+
+\subsection{Notations}
+
+We denote by~$P_h^n \subset \bar P_h^n$ spaces of continuous and discontinuous nodal~$P_n$ interpolants defined on~$\Omega_\Gamma^h$, respectively. For a function~$f$, $I_h^n(f) \in P_h^n$ is the corresponding interpolant; we will use the notation~$f_h^n$ to emphasize that~$f_h^n \in P_h^n$ and~$f_h^n$ approximates~$f$ in some sense, but~$I_h^n(f) \ne f_h^n$.
+
+We set
+\begin{align}\label{gammah}
+	\Gamma_h^n &\coloneqq \{ \vect x \in \mathbb{R}^3 : \big(I_h^n(\phi)\big)(\vect x) = 0 \}, \\
+	\vect n_{\Gamma_h^n} &= \frac{\nabla I_h^n(\phi)}{\|\nabla I_h^n(\phi)\|} \not\in \bar{P}_h^m\text{ for any }m. \label{gammah:n}
+\end{align}  
+Note that~$\Gamma_h^n$ is a continuous piecewise $P_n$ surface in~$\Omega_\Gamma^h$, and $\Gamma_h^n \ne I_h^n(\Gamma)$. The unit normal~$\vect n_{\Gamma_h^n}$ is not a rational function; it is continuous in~$T \in \Omega_\Gamma^h$ and discontinuous on faces.   
+
+\subsection{Approximation of integrands involving~$\text{n}_\Gamma$}
+
+We start with description of the continuous levelset~$\phi$ of~$\Gamma = \left\{ \vect x \in \mathbb{R}^3 : \phi(\vect x) = 0 \right\}$. It is stored in~\texttt{levelset\_fun} variable. For example, for the unit sphere we have:  
+\begin{lstlisting}
+// surfnavierstokes_funcs.h
+DROPS::Point3DCL sphere_2_shift(0.);
+double sphere_2 (const DROPS::Point3DCL& p, double) {
+	return pow(p[0] - sphere_2_shift[0], 2.) + 
+	       pow(p[1] - sphere_2_shift[1], 2.) + 
+	       pow(p[2] - sphere_2_shift[2], 2.) - 1.;
+}
+
+// surfnavierstokes.cpp
+instat_scalar_fun_ptr levelset_fun;
+// ...
+levelset_fun = &sphere_2;
+\end{lstlisting}
+\vskip .2cm
+Continuous piecewise $P_2$ interpolant~$I_h^2(\phi)$ of $\phi$ is built on~$\Omega_\Gamma^h$ via iterating over vertices and edges of~$\Omega_\Gamma^h$. It is stored in~\texttt{lset} object:
+\begin{lstlisting}
+// levelset.cpp
+void LevelsetP2ContCL::Init( instat_scalar_fun_ptr phi0, double t) {
+	const Uint lvl= Phi.GetLevel(),
+	idx= Phi.RowIdx->GetIdx();
+	for (auto it = MG_.GetTriangVertexBegin(lvl), end = MG_.GetTriangVertexEnd(lvl); it != end; ++it) {
+		if (it->Unknowns.Exist(idx))
+			Phi.Data[it->Unknowns(idx)]= phi0( it->GetCoord(), t);
+	}
+	for (auto it = MG_.GetTriangEdgeBegin(lvl), end = MG_.GetTriangEdgeEnd(lvl); it != end; ++it) {
+		if (it->Unknowns.Exist(idx))
+			Phi.Data[it->Unknowns(idx)]= phi0( GetBaryCenter( *it), t);
+	}
+}
+
+// surfnavierstokes.cpp
+DROPS::LevelsetP2CL& lset(*DROPS::LevelsetP2CL::Create(mg, lsbnd, sf));
+// ...
+lset.Init(levelset_fun);
+\end{lstlisting}
+\vskip .2cm
+In order to assemble matrices in~\eqref{mtx} for e.g. $\vect P_1$\,--\,$P_1$ elements, one calls
+\begin{lstlisting}
+SetupNavierStokesIF_P1P1(mg, &A, /* ... */ lset.Phi, /* ... */);
+\end{lstlisting}
+(\textbf{Interestingly enough}, this function does not get~\texttt{lset} object that represents the interpolant; it gets only~\texttt{lset.Phi}, which is the object of type~\texttt{VecDescCL}. \texttt{lset.Phi} is essentially just a vector of values of~$\phi$ at interpolation points (i.e. vertices and edges' centroids of~$\Omega_\Gamma^h$). That is, the assembling function above has no idea what~\texttt{lset.Phi} actually represents: one may interpret it as an element of~$P_h^2$ or e.g. $P_{h/2}^1$. Who knows?..)
+ 
+\textbf{No} interpolation is built explicitly for~$\vect n_{\Gamma_h^2}$ in~\eqref{gammah:n}; it is implicitly represented via \texttt{qnormal} data field:
+\begin{lstlisting}
+// ifacetransp.cpp
+class LocalStokesCL {
+	// ...
+	GridFunctionCL<Point3DCL> qnormal;
+	// ...
+}
+\end{lstlisting}
+\texttt{qnormal} object is essentially a set of values of type~\texttt{Point3DCL} which are obtained by mapping a (vector valued) function to suitable quadrature nodes. This is how it is constructed:   
+\begin{lstlisting}
+// ifacetransp.cpp
+void LocalStokesCL::Get_Normals(const LocalP2CL<>& ls, LocalP1CL<Point3DCL>& Normals) {
+	for(int i=0; i<10 ; ++i)
+		Normals+=ls[i]*P2Grad[i];
+}
+// ...
+void LocalStokesCL::calcIntegrands(const SMatrixCL<3,3>& T, const LocalP2CL<>& ls, const TetraCL& tet) {
+	// ...
+	LocalP1CL<Point3DCL> Normals;
+	Get_Normals(ls, Normals);
+	resize_and_evaluate_on_vertexes (Normals, q2Ddomain, qnormal);
+	for(Uint i=0; i<qnormal.size(); ++i) 
+		qnormal[i]= qnormal[i]/qnormal[i].norm();
+	// ...
+}
+\end{lstlisting}
+First $\nabla I_h^2(\phi|_T)$ is built (locally for a tetrahedron~$T \in \Omega_\Gamma^h$ represented by~\texttt{tet}) and saved to \texttt{Normals} object. \texttt{ls[i]} gives the value of~$\phi|_T$ at $i$th node (vertices and edges' centroids\,---\,there are 10 of them for tetrahedra), and \texttt{P2Grad[i]} represents the gradient of quadratic basis function which itself is linear. (Actually, it is sufficient to have $4 < 10$ linear functions to represent $\nabla I_h^2(\phi|_T)$, but this is how it is implemented here.) Finally, \texttt{qnormal} object is built via evaluating \texttt{Normals} at quadrature nodes and normalization.
+
+Objects \texttt{qnormal} for surface integrals and \texttt{q3Dnormal} for volume integrals are used in approximation of~$\vect P = \vect I - \vect n\,\vect n^T$, normal derivatives, and taking-normal-components in~\eqref{mtx}. \texttt{q3Dnormal} is constructed as~\texttt{qnormal} but for quadrature points of tetrahedrons, not triangles. 
+
+For one, $\vect P\,\nabla f_h^2$, $f_h^2 \coloneqq P_2$ basis function on~$\Omega_\Gamma^h$, is approximated via~\texttt{qsurfP2grad} object:
+\begin{lstlisting}
+// ifacetransp.cpp
+void LocalStokesCL::calcIntegrands(/* ... */) {
+    // ...
+    for(int j=0; j<10 ;++j) {
+		resize_and_evaluate_on_vertexes(P2Grad[j], q2Ddomain, qsurfP2grad[j]);
+		qsurfP2grad[j]-= dot(qsurfP2grad[j], qnormal)*qnormal;
+	}
+	// ...
+}
+\end{lstlisting}  
+The term~$\int_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\vect n} \frac{\partial q}{\partial\vect n} \diff{\vect x}$ in~\eqref{mtx} is computed as
+\begin{lstlisting}
+// ifacetransp.cpp
+void LocalStokesCL::setupA_P1_stab(double A_P1_stab[4][4], double absdet) {
+	for (int i=0; i<4; ++i) 
+		for (int j=0; j<4; ++j) 
+			A_P1_stab[i][j] = quad(dot(q3Dnormal, q3DP1Grad[i])*dot(q3Dnormal, q3DP1Grad[j]), absdet, q3Ddomain, AllTetraC);
+}
+\end{lstlisting}
+
+\subsection{Quadrature rules for~$\int_{\Gamma}$ and $\int_{\Omega_\Gamma^h}$}
+
+All the 3D integrals in~\eqref{mtx} are computed via iteration over~$T \in \Omega_\Gamma^h$ without any virtual refinements. \texttt{q3Ddomain} object represents the set of quadrature nodes and weights:
+\begin{lstlisting}
+// ifacetransp.cpp
+void LocalStokesCL::calc3DIntegrands(/* ... */) {
+	make_SimpleQuadDomain<Quad5DataCL> (q3Ddomain, AllTetraC);
+	// ...
+}
+\end{lstlisting} 
+It is used e.g. in~\texttt{setupA\_P1\_stab} above. 15 nodes and weights are used, and the quadrature is exact for functions in~$\bar P_h^5$.
+
+All the surface integrals are computed using~$\Gamma_{h/2}^1$. One extra ``virtual'' refinement is achieved via setting 
+\begin{lstlisting}
+// ifacetransp.cpp
+LocalStokesCL(bool fullGradient) 
+	: lat(PrincipalLatticeCL::instance(2))
+	, /* ... */ { /* ... */ }
+\end{lstlisting}
+(Changing 2 to 4 will give us~$\Gamma_{h/4}^1$ and so forth.) \texttt{q2Ddomain} object represents the set of quadrature nodes and weights:
+\begin{lstlisting}
+// ifacetransp.cpp
+void LocalStokesCL::calcIntegrands(/* ... */) {
+	// ...
+	evaluate_on_vertexes( ls, lat, Addr( ls_loc));
+	spatch.make_patch<MergeCutPolicyCL>( lat, ls_loc);
+	make_CompositeQuad5Domain2D ( q2Ddomain, spatch, tet);
+	// ...
+}
+\end{lstlisting} 
+Each linear subsurface in~$T \in \Omega_\Gamma^h$ has 7 quadrature nodes and weights, and the quadrature rule is again exact for functions in~$\bar P_h^5$.
+
+\subsection{Summary}
+
+The matrices in~\eqref{mtx} are assembled as
+\begin{align}\begin{split}\label{mtx_exact}
+	\langle \vect A\,\bar{\vect u}, \bar{\vect v} \rangle &= 
+		\int^5_{\Gamma_{h/2}^1} \big( E_{s,\,\Gamma_{h}^2}(\vect u) : E_{s,\,\Gamma_{h}^2}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma_{h}^2})\,(\vect v\cdot\vect n_{\Gamma_{h}^2}) \big) \diff{s} \\
+	&
+		+ \rho_u \int^5_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n_{\Gamma_{h}^2}}\cdot\frac{\partial \vect v}{\partial\vect n_{\Gamma_{h}^2}} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
+	\langle \vect B\,\bar{\vect u}, \bar{\vect q} \rangle &= 
+		-\int^5_{\Gamma_{h/2}^1} q\,\Div_{\Gamma_{h}^2} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
+	\langle \vect M_0\,\bar{\vect p}, \bar{\vect q} \rangle &=
+		\int^5_{\Gamma_{h/2}^1} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_n\,\bar{\vect p}, \bar{\vect q} \rangle &=
+		\rho_p \int^5_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\vect n_{\Gamma_{h}^2}} \frac{\partial q}{\partial\vect n_{\Gamma_{h}^2}} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_{\text{full}}\,\bar{\vect p}, \bar{\vect q} \rangle &=
+		\rho_p \int^5_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},		 
+\end{split}\end{align}
+Comments:
+\begin{itemize}
+	\item $\int^5$ denotes a composite quadrature rule that is exact for~$\bar P_h^5$,
+	\item $E_{s,\,\Gamma_{h}^2}$ and~$\Div_{\Gamma_{h}^2}$ are defined as their continuous analogues with~$\vect n_{\Gamma}$ in~$\vect P$ replaced with~$\vect n_{\Gamma_{h}^2}$,
+	\item It is always the case that integrands use~$\vect n_{\Gamma_{h}^2} \ne \vect n_{\Gamma_{h/2}^1}$, and the actual domain of integration is~$\Gamma_{h/2}^1 \ne \Gamma_{h}^2$,
+	\item $\vect n_{\Gamma_{h}^2}$ is defined in~\eqref{gammah:n} and it is not a polynomial even locally, thus quadrature rules are never exact (although for $\vect P_2$\,--\,$P_1$ shape functions alone these quadratures are exact),
+	\item In our examples we know~$\phi$ and~$\nabla \phi$ exactly, and thus it is super easy to feed the \textbf{exact} normal~$\vect n_{\Gamma} \ne \vect n_{\Gamma_{h}^2}$ to quadratures. Shall we do this?
+\end{itemize}
 
 \bibliographystyle{plain}
 \bibliography{bibl}
