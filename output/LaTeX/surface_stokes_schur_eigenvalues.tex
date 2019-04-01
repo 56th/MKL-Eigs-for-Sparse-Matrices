@@ -46,6 +46,9 @@
 \newcommand{\sphere}{{\Gamma_{\text{sph}}}}
 \newcommand{\tor}{{\Gamma_{\text{tor}}}}
 
+\newcommand{\LTwoSpace}[1][\Gamma]{{\mathbb L^2\left({#1}\right)}}
+\newcommand{\HOneSpace}[1][\Gamma]{{\mathbb H^1\left({#1}\right)}}
+
 \usepackage{listings}
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \lstset{
@@ -59,7 +62,7 @@
 	belowskip=-1pt
 } 
 
-\title{Some computational results for generalized pressure Schur complement eigenvalues of the surface Stokes problem}
+\title{Some computational results for $\vect{P}_1$\,--\,$P_1$ and $\vect{P}_2$\,--\,$P_1$ Trace\,FEM for the surface Stokes problem}
 \author{
 	Alexander Zhiliakov\thanks{Department of Mathematics, University of Houston, Houston, Texas 77204 (alex@math.uh.edu).}
 }
@@ -67,11 +70,15 @@
 \begin{document}
 	
 \maketitle
+
+\tableofcontents
 	
 \let\oldtabular\tabular
 \renewcommand{\tabular}[1][1.5]{\def\arraystretch{#1}\oldtabular}
 
-\section{Bilinear forms and matrices}
+\section{Inf-sup stability: generalized pressure Schur complement eigenvalues}
+
+\subsection{Bilinear forms and matrices}
 
 We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be the number of pressure d.o.f. Vector stiffness, divergence, pressure mass, normal stabilization, and full stabilization matrices resulting from Trace\,FEM discretization of the surface Stokes problem~\cite{surfstokes} are defined via
 \begin{align}\begin{split}\label{mtx}
@@ -111,7 +118,7 @@ i.e. in solving
 \end{equation}
 where ``$\star$'' stands for ``$0$,'' ``$n$,'' or ``full.'' We denote by~$0 = \lambda_1 < \lambda_2 \le \dots \le \lambda_{n_{\vect S}} = O(1)$ the spectrum of~\eqref{problem}.
 
-\section{Solution description}
+\subsection{Solution description}
 
 Computing $\vect A^{-1}$ in~\eqref{schur} becomes troublesome already for $h = 5.21\times10^{-2}$ ($n_{\vect A} = 32736$ for $\vect u \in \vect P_1$ FE space): although $\vect A$ is sparse, $\vect A^{-1}$ is dense and consumes 8.5+ GB in double-precision arithmetic. A quick research \href{https://mathematica.stackexchange.com/questions/189620/matrix-free-arnoldi-method-for-eigensystems}{showed} that \texttt{Mathematica} has no built-in matrix-free eigenvalue routines. \texttt{Intel MKL}'s FEAST algorithm for computing (generalized) eigenvalues in an interval \href{https://software.intel.com/sites/default/files/mkl-2019-developer-reference-c.pdf#_OPENTOPIC_TOC_PROCESSING_d62e853651}{is suitable for matrix-free implementations}; however, it requires some expensive operations to be implemented (e.g. matrix-matrix multiplications $\vect Y \leftarrow \vect S_\star\,\vect X$, $\vect Y \leftarrow \vect M_\star\,\vect X$ and approximating the action of inverses in the form $\vect y \leftarrow (\sigma\,\vect M_\star - \vect S_\star)^{-1}\,\vect x$).
 
@@ -146,7 +153,7 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 
 \footnotetext{The majority of generalized eigenvalue solvers require left-hand-side matrix to be Hermitian and right-hand-side matrix to be Hermitian \textbf{positive definite}; that's why we need to introduce $\epsilon > 0$.}     
 
-\section{Numerical results: dependency of the spectrum on the mesh size}
+\subsection{Numerical results: dependency of the spectrum on the mesh size}
 
 \begin{figure}[h]
 	\centering
@@ -301,7 +308,7 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 
 \clearpage
 
-\section{Numerical results: sensitivity of the spectrum to levelset shifts}
+\subsection{Numerical results: sensitivity of the spectrum to levelset shifts}
 
 In this section we investigate the sensitivity of the spectrum to levelset shifts
 \begin{equation}\label{shift}
@@ -360,6 +367,20 @@ We construct the bulk mesh~$\Omega_h^\Gamma$ and then perform the assembly of ma
 \end{table}
 
 \clearpage
+
+\section{Convergence results}
+
+\begin{table}[h]
+	\centering\small
+	\caption{$\vect P_1$\,--\,$P_1$, $\Gamma = \sphere$}
+	\label{tab:p1p1_conv}
+	\begin{tabular}[1.3]{|c||c|c||c|c||c|c|}
+		\hline
+		$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+		\hline
+		\input{sphere_2_P1P1_shift=0.0h_conv_table.tex}
+	\end{tabular}
+\end{table}
 
 \section{Notes on DROPS implementation}
 
@@ -485,14 +506,14 @@ void LocalStokesCL::calc3DIntegrands(/* ... */) {
 \end{lstlisting} 
 It is used e.g. in~\texttt{setupA\_P1\_stab} above. 15 nodes and weights are used, and the quadrature is exact for functions in~$\bar P_h^5$.
 
-All the surface integrals are computed using~$\Gamma_{h/2}^1$. One extra ``virtual'' refinement is achieved via setting 
+All the surface integrals are also computed via iteration over~$T \in \Omega_\Gamma^h$, but using~$\Gamma_{h/2}^1$. One extra ``virtual'' refinement is achieved via setting 
 \begin{lstlisting}
 // ifacetransp.cpp
 LocalStokesCL(bool fullGradient) 
 	: lat(PrincipalLatticeCL::instance(2))
 	, /* ... */ { /* ... */ }
 \end{lstlisting}
-(Changing 2 to 4 will give us~$\Gamma_{h/4}^1$ and so forth.) \texttt{q2Ddomain} object represents the set of quadrature nodes and weights:
+\texttt{PrincipalLatticeCL::instance(2)} means that each edge of the tetrahedron~$T \in \Omega_\Gamma^h$ is split into 2 edges, and~$T$ is split into 8 smaller tetrahedrons. Changing 2 to 4 will give us~$\Gamma_{h/4}^1$ and so forth. \texttt{q2Ddomain} object represents the set of quadrature nodes and weights:
 \begin{lstlisting}
 // ifacetransp.cpp
 void LocalStokesCL::calcIntegrands(/* ... */) {
