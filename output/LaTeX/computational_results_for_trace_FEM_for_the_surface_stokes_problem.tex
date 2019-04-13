@@ -5,12 +5,17 @@
 \usepackage{amsthm}
 
 \usepackage[dvipsnames, table]{xcolor}
+\colorlet{DarkRed}{Red!90!black}
+\colorlet{LightRed}{Red!10!white}
+\colorlet{DarkGreen}{Green!50!black}
+\colorlet{LightGreen}{Green!10!white}
+\usepackage{colortbl} % https://texblog.org/2011/04/19/highlight-table-rowscolumns-with-color/
 % links
 \usepackage{hyperref}
 \hypersetup{
 	colorlinks,
-	linkcolor={Red!90!black},
-	citecolor={Red!90!black},
+	linkcolor={DarkRed},
+	citecolor={DarkRed},
 	urlcolor={blue}
 }
 
@@ -82,19 +87,19 @@
 
 We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be the number of pressure d.o.f. Vector stiffness, divergence, pressure mass, normal stabilization, and full stabilization matrices resulting from Trace\,FEM discretization of the surface Stokes problem~\cite{surfstokes} are defined via
 \begin{align}\begin{split}\label{mtx}
-	\langle \vect A\,\bar{\vect u}, \bar{\vect v} \rangle &\approx 
+	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &\approx 
 		\int_{\Gamma} \big( E_s(\vect u) : E_s(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n)\,(\vect v\cdot\vect n) \big) \diff{s} + 
 		\rho_u \int_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n}\cdot\frac{\partial \vect v}{\partial\vect n} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
-	\langle \vect B\,\bar{\vect u}, \bar{\vect q} \rangle &\approx 
+	\langle \vect B\,\vec{\vect u}, \vec{\vect q} \rangle &\approx 
 		-\int_{\Gamma} q\,\Div_{\Gamma} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
-	\langle \vect M_0\,\bar{\vect p}, \bar{\vect q} \rangle &\approx
+	\langle \vect M_0\,\vec{\vect p}, \vec{\vect q} \rangle &\approx
 		\int_{\Gamma} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
-	\langle \vect C_n\,\bar{\vect p}, \bar{\vect q} \rangle &\approx
+	\langle \vect C_n\,\vec{\vect p}, \vec{\vect q} \rangle &\approx
 		\rho_p \int_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\vect n} \frac{\partial q}{\partial\vect n} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
-	\langle \vect C_{\text{full}}\,\bar{\vect p}, \bar{\vect q} \rangle &\approx
+	\langle \vect C_{\text{full}}\,\vec{\vect p}, \vec{\vect q} \rangle &\approx
 		\rho_p \int_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},		 
 \end{split}\end{align}
-respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega_\Gamma^h$ is the domain consisting of tetrahedra cut by $\Gamma$. Here~$\bar{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\bar{\vect p}$ and $p$). See~\eqref{mtx_exact} for the computational details. Mesh-dependent parameters are set as
+respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega_\Gamma^h$ is the domain consisting of tetrahedra cut by $\Gamma$. Here~$\vec{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\vec{\vect p}$ and $p$). See~\eqref{mtx_exact} and~\eqref{mtx_exact_2} for the computational details. Mesh-dependent parameters are set as
 \begin{equation}
 	\tau = h^{-2}, \quad \rho_u = \rho_p = h,
 \end{equation}
@@ -368,34 +373,146 @@ We construct the bulk mesh~$\Omega_h^\Gamma$ and then perform the assembly of ma
 
 \clearpage
 
-\section{Convergence results}
+\section{Convergence results}\label{sec:conv}
 
-\begin{table}[h]
+We solve model problem from~\cite[p.\,20]{surfstokes}. We set
+\begin{align}\begin{split}\label{exact_soln}
+	\tilde{\vect u}(x, y, z) &\coloneqq (-z^2, y, x)^T, \\
+	\tilde p(x, y, z) &\coloneqq x\,y^2 + z, \\
+	\phi(\vect x) &\coloneqq \|\vect x\|^2 - 1.
+\end{split}\end{align}
+The exact solution on the unit sphere is chosen as 
+\begin{equation}\label{exact_soln_2}
+	\vect u(\vect x) \coloneqq \vect P\,\tilde{\vect u}\big(\frac{\vect x}{\|\vect x\|}\big), \quad
+	p(\vect x) \coloneqq \tilde p\big(\frac{\vect x}{\|\vect x\|}\big).
+\end{equation}
+This way we ``extend''~\eqref{exact_soln} radially. It is useful since we use \textit{the approximation} of~$\sphere$.
+
+\subsection{$\text{P}_1$\,--\,$P_1$ Trace\,FEM}
+
+Here we compare approaches~\eqref{mtx_exact} and~\eqref{mtx_exact_2}. We use two virtual refinements for surface integrals, $m = 2$, so we have $\Gamma_{h/2}^{2 \to 1} = \Gamma_{h/2}^1$ (see~\eqref{gammah} and~\eqref{gammah2}). We use the full stabilization matrix~$\vect C_{\text{full}}$. Note that~$\phi \in P_2$ in~\eqref{exact_soln}, and hence~$\Gamma_h^2 = \Gamma$. Thus~\eqref{mtx_exact} boils down to
+\begin{align}\begin{split}\label{mtx_exact_p1}
+	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &= 
+		\int^5_{\Gamma_{h/2}^1} \big( E_{s,\,\Gamma}(\vect u) : E_{s,\,\Gamma}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma})\,(\vect v\cdot\vect n_{\Gamma}) \big) \diff{s} \\
+	&
+		+ \rho_u \int^5_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n_{\Gamma}}\cdot\frac{\partial \vect v}{\partial\vect n_{\Gamma}} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
+	\langle \vect B\,\vec{\vect u}, \vec{\vect q} \rangle &= 
+		-\int^5_{\Gamma_{h/2}^1} q\,\Div_{\Gamma} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
+	\langle \vect M_0\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\int^5_{\Gamma_{h/2}^1} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_{\text{full}}\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\rho_p \int^5_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},		 
+\end{split}\end{align}
+and e.g. the integrand that involves $E_{s,\,\Gamma} \equiv E_s$ is exact. Similarly, approach~\eqref{mtx_exact_2} boils down to
+\begin{align}\begin{split}\label{mtx_exact_2_p1}
+	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &= 
+		\int^5_{\Gamma_{h/2}^1} \big( E_{s,\,\Gamma_{h/2}^1}(\vect u) : E_{s,\,\Gamma_{h/2}^1}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma})\,(\vect v\cdot\vect n_{\Gamma}) \big) \diff{s} \\
+	&
+		+ \rho_u \int^5_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n_{\Gamma}}\cdot\frac{\partial \vect v}{\partial\vect n_{\Gamma}} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
+	\langle \vect B\,\vec{\vect u}, \vec{\vect q} \rangle &= 
+		-\int^5_{\Gamma_{h/2}^1} q\,\Div_{\Gamma_{h/2}^1} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
+	\langle \vect M_0\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\int^5_{\Gamma_{h/2}^1} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_{\text{full}}\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\rho_p \int^5_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}}.
+\end{split}\end{align}
+
+For statistics: using 56 CPUs, computation of the meshlevel~6 ($h = 2.6\times10^{-2}$) takes~${\sim}14$ minutes, meshlevel~7 takes~${\sim}75$ minutes, and meshlevel~8 takes~${\sim}7.3$ hours.
+
+\begin{table}[h!]
 	\centering\small
-	\caption{$\vect P_1$\,--\,$P_1$, $\Gamma = \sphere$}
+	\caption{Convergence results. Matrices are assembled as in~\eqref{mtx_exact_p1} (top table) and~\eqref{mtx_exact_2_p1} (bottom table)}
 	\label{tab:p1p1_conv}
-	\begin{tabular}[1.3]{|c||c|c||c|c||c|c|}
-		\hline
-		$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
-		\hline
-		\input{sphere_2_P1P1_shift=0.0h_conv_table.tex}
-	\end{tabular}
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c|c|}
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+			\hline
+			\input{sphere_2_P1P1_normals=P2_shift=0.0h_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 4mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c|c|}
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+			\hline
+			\input{sphere_2_P1P1_normals=exact_shift=0.0h_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+
 \end{table}
+
+\begin{table}[h!]
+	\centering\small
+	\caption{Solver statistics for~\eqref{mtx_exact_p1} (left table) and~\eqref{mtx_exact_2_p1} (right table)}
+	\label{tab:p1p1_iters}
+	\begin{subtable}{.5\linewidth}\centering
+		\begin{tabular}[1.3]{|c|c|c|}
+			\hline
+			$h$ & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P1P1_normals=P2_shift=0.0h_iters_table.tex}
+		\end{tabular}
+	\end{subtable}%
+	\begin{subtable}{.5\linewidth}\centering
+		\begin{tabular}[1.3]{|c|c|c|}
+			\hline
+			$h$ & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P1P1_normals=exact_shift=0.0h_iters_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}
+
+%\begin{table}[h!]
+%	\centering\small
+%	\caption{$\vect P_1$\,--\,$P_1$, $\Gamma = \sphere$. Here we use $\Gamma + \alpha_h\,\vect s$ to build (refine) the bulk mesh, and then solve the actual problem using~$\Gamma$. We set~$\alpha_h \coloneqq 0.3\,h$, $\vect s \coloneqq (1, 1, 1)^T/\sqrt{3}$}
+%	\label{tab:p1p1_conv_shift}
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c|c|}
+%			\hline
+%			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+%			\hline
+%			\input{sphere_2_P1P1_shift=0.3h_conv_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%	\vskip 4mm
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c|c|c|}
+%			\hline
+%			$h$ & Outer iterations & Residual norm \\
+%			\hline
+%			\input{sphere_2_P1P1_shift=0.3h_iters_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%\end{table}
+
+The errors in Table~\ref{tab:p1p1_conv} are computed as explained in section~\ref{subsec:err}.
+
+\subsection{$\text{P}_2$\,--\,$P_1$ Trace\,FEM}
+
+(\dots TBA \dots)
 
 \section{Notes on DROPS implementation}
 
-\subsection{Notations}
+\subsection{Notations}\label{subsec:not}
 
 We denote by~$P_h^n \subset \bar P_h^n$ spaces of continuous and discontinuous nodal~$P_n$ interpolants defined on~$\Omega_\Gamma^h$, respectively. For a function~$f$, $I_h^n(f) \in P_h^n$ is the corresponding interpolant; we will use the notation~$f_h^n$ to emphasize that~$f_h^n \in P_h^n$ and~$f_h^n$ approximates~$f$ in some sense, but~$I_h^n(f) \ne f_h^n$.
 
 We set
 \begin{align}\label{gammah}
 	\Gamma_h^n &\coloneqq \{ \vect x \in \mathbb{R}^3 : \big(I_h^n(\phi)\big)(\vect x) = 0 \}, \\
-	\vect n_{\Gamma_h^n} &= \frac{\nabla I_h^n(\phi)}{\|\nabla I_h^n(\phi)\|} \not\in \bar{P}_h^m\text{ for any }m. \label{gammah:n}
+	\vect n_{\Gamma_h^n} &= \frac{\nabla I_h^n(\phi)}{\|\nabla I_h^n(\phi)\|} \not\in \bar{P}_h^m\text{ for any $m$ if $n > 1$}. \label{gammah:n}
 \end{align}  
-Note that~$\Gamma_h^n$ is a continuous piecewise $P_n$ surface in~$\Omega_\Gamma^h$, and $\Gamma_h^n \ne I_h^n(\Gamma)$. The unit normal~$\vect n_{\Gamma_h^n}$ is not a rational function; it is continuous in~$T \in \Omega_\Gamma^h$ and discontinuous on faces.   
+Note that~$\Gamma_h^n$ is a continuous piecewise $P_n$ surface in~$\Omega_\Gamma^h$, and $\Gamma_h^n \ne I_h^n(\Gamma)$. The unit normal~$\vect n_{\Gamma_h^n}$ is not a rational function; it is continuous in~$T \in \Omega_\Gamma^h$ and discontinuous on faces. We also define
+\begin{equation}\label{gammah2}
+	\Gamma_{h/m}^{2 \rightarrow 1} \coloneqq \{ \vect x \in \mathbb{R}^3 : \Big(I_{h/m}^1\big(I_h^2(\phi)\big)\Big)(\vect x) = 0 \}.
+\end{equation}  
+Note that~$I_{h/2}^1\big(I_{h}^2(\phi)\big) = I_{h/2}^1(\phi)$ (since in order to build both~$I_{h/2}^1$ and~$I_{h}^2$ the same values of~$\phi$ are used), and~$I_{h/m}^1\big(I_{h}^2(\phi)\big) \ne I_{h/m}^1(\phi)$ for~$m > 2$. Thus we have~$\Gamma_{h/2}^{2 \rightarrow 1} = \Gamma_{h/2}^1$, and~$\Gamma_{h/m}^{2 \rightarrow 1} \ne \Gamma_{h/m}^1$ for~$m > 2$.
+%Note also that~$\Gamma_{h/m}^{2 \rightarrow 1} \ne I_{h/m}^1(\Gamma_h^2)$ since $\Gamma_{h/m}^{2 \rightarrow 1}$ connects roots of piecewise \textbf{linear} functions, and~$I_{h/m}^1(\Gamma_h^2)$ connects roots  
 
-\subsection{Approximation of integrands involving~$\text{n}_\Gamma$}
+\subsection{Approximation of integrands involving~$\text{n}_\Gamma$}\label{subsec:app}
 
 We start with description of the continuous levelset~$\phi$ of~$\Gamma = \left\{ \vect x \in \mathbb{R}^3 : \phi(\vect x) = 0 \right\}$. It is stored in~\texttt{levelset\_fun} variable. For example, for the unit sphere we have:  
 \begin{lstlisting}
@@ -494,7 +611,7 @@ void LocalStokesCL::setupA_P1_stab(double A_P1_stab[4][4], double absdet) {
 }
 \end{lstlisting}
 
-\subsection{Quadrature rules for~$\int_{\Gamma}$ and $\int_{\Omega_\Gamma^h}$}
+\subsection{Quadrature rules for~$\int_{\Gamma}$ and $\int_{\Omega_\Gamma^h}$}\label{subsec:integrals}
 
 All the 3D integrals in~\eqref{mtx} are computed via iteration over~$T \in \Omega_\Gamma^h$ without any virtual refinements. \texttt{q3Ddomain} object represents the set of quadrature nodes and weights:
 \begin{lstlisting}
@@ -513,7 +630,7 @@ LocalStokesCL(bool fullGradient)
 	: lat(PrincipalLatticeCL::instance(2))
 	, /* ... */ { /* ... */ }
 \end{lstlisting}
-\texttt{PrincipalLatticeCL::instance(2)} means that each edge of the tetrahedron~$T \in \Omega_\Gamma^h$ is split into 2 edges, and~$T$ is split into 8 smaller tetrahedrons. Changing 2 to 4 will give us~$\Gamma_{h/4}^1$ and so forth. \texttt{q2Ddomain} object represents the set of quadrature nodes and weights:
+\texttt{PrincipalLatticeCL::instance(2)} means that each edge of the tetrahedron~$T \in \Omega_\Gamma^h$ is split into 2 edges, and~$T$ is split into 8 smaller tetrahedrons. Changing 2 to 4 will give us~$\Gamma_{h/4}^{2 \rightarrow 1}$ from~\eqref{gammah2} and so forth. \texttt{q2Ddomain} object represents the set of quadrature nodes and weights:
 \begin{lstlisting}
 // ifacetransp.cpp
 void LocalStokesCL::calcIntegrands(/* ... */) {
@@ -526,31 +643,146 @@ void LocalStokesCL::calcIntegrands(/* ... */) {
 \end{lstlisting} 
 Each linear subsurface in~$T \in \Omega_\Gamma^h$ has 7 quadrature nodes and weights, and the quadrature rule is again exact for functions in~$\bar P_h^5$.
 
-\subsection{Summary}
+\texttt{spatch} represents a set of triangles that form~$\Gamma_{h/2}^1$ inside~$T$. That is, in order to approximate zeros of~$\phi$, $I_{h/2}^1\big(I_{h}^2(\phi)\big) = I_{h/2}^1(\phi)$ is used:
+\begin{lstlisting}
+// subtriangulation.h
+// ...
+const double edge_bary1_cut= ls0/(ls0 - ls1); // the root of the level set function on the edge
+// ...
+\end{lstlisting}
+Here~$l(x) := \texttt{ls0}\,(1-x) + \texttt{ls1}\,x$ is a linear function defined on the master edge~$[0, 1]$. Indeed, its root is~$x = \texttt{ls0/(ls0 - ls1)}$.
+
+\subsection{Summary on the matrix assembly}
 
 The matrices in~\eqref{mtx} are assembled as
 \begin{align}\begin{split}\label{mtx_exact}
-	\langle \vect A\,\bar{\vect u}, \bar{\vect v} \rangle &= 
-		\int^5_{\Gamma_{h/2}^1} \big( E_{s,\,\Gamma_{h}^2}(\vect u) : E_{s,\,\Gamma_{h}^2}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma_{h}^2})\,(\vect v\cdot\vect n_{\Gamma_{h}^2}) \big) \diff{s} \\
+	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &= 
+		\int^5_{\Gamma_{h/m}^{2 \to 1}} \big( E_{s,\,\Gamma_{h}^2}(\vect u) : E_{s,\,\Gamma_{h}^2}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma_{h}^2})\,(\vect v\cdot\vect n_{\Gamma_{h}^2}) \big) \diff{s} \\
 	&
 		+ \rho_u \int^5_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n_{\Gamma_{h}^2}}\cdot\frac{\partial \vect v}{\partial\vect n_{\Gamma_{h}^2}} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
-	\langle \vect B\,\bar{\vect u}, \bar{\vect q} \rangle &= 
-		-\int^5_{\Gamma_{h/2}^1} q\,\Div_{\Gamma_{h}^2} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
-	\langle \vect M_0\,\bar{\vect p}, \bar{\vect q} \rangle &=
-		\int^5_{\Gamma_{h/2}^1} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
-	\langle \vect C_n\,\bar{\vect p}, \bar{\vect q} \rangle &=
+	\langle \vect B\,\vec{\vect u}, \vec{\vect q} \rangle &= 
+		-\int^5_{\Gamma_{h/m}^{2 \to 1}} q\,\Div_{\Gamma_{h}^2} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
+	\langle \vect M_0\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\int^5_{\Gamma_{h/m}^{2 \to 1}} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_n\,\vec{\vect p}, \vec{\vect q} \rangle &=
 		\rho_p \int^5_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\vect n_{\Gamma_{h}^2}} \frac{\partial q}{\partial\vect n_{\Gamma_{h}^2}} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
-	\langle \vect C_{\text{full}}\,\bar{\vect p}, \bar{\vect q} \rangle &=
+	\langle \vect C_{\text{full}}\,\vec{\vect p}, \vec{\vect q} \rangle &=
 		\rho_p \int^5_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},		 
 \end{split}\end{align}
 Comments:
 \begin{itemize}
-	\item $\int^5$ denotes a composite quadrature rule that is exact for~$\bar P_h^5$,
+	\item $\int^5_{\Gamma_{h/m}^{2 \to 1}} \cdot \diff{s}$ denotes a composite quadrature rule that is exact for~$\bar P_h^5(\Gamma_{h/m}^{2 \to 1})$, i.e. this quadrature is exact for piecewise polynomials up to degree~5 on each triangular patch~$\gamma \in \Gamma_{h/m}^{2 \to 1}$, 
+	\item $\int^5_{\Omega^{\Gamma}_h} \cdot \diff{\vect x}$ denotes a composite quadrature rule that is exact for~$\bar P_h^5(\Omega^{\Gamma}_h)$, i.e. this quadrature is exact for piecewise polynomials up to degree~5 on each tetrahedron~$T \in \Omega^{\Gamma}_h$, 
 	\item $E_{s,\,\Gamma_{h}^2}$ and~$\Div_{\Gamma_{h}^2}$ are defined as their continuous analogues with~$\vect n_{\Gamma}$ in~$\vect P$ replaced with~$\vect n_{\Gamma_{h}^2}$,
-	\item It is always the case that integrands use~$\vect n_{\Gamma_{h}^2} \ne \vect n_{\Gamma_{h/2}^1}$, and the actual domain of integration is~$\Gamma_{h/2}^1 \ne \Gamma_{h}^2$,
-	\item $\vect n_{\Gamma_{h}^2}$ is defined in~\eqref{gammah:n} and it is not a polynomial even locally, thus quadrature rules are never exact (although for $\vect P_2$\,--\,$P_1$ shape functions alone these quadratures are exact),
-	\item In our examples we know~$\phi$ and~$\nabla \phi$ exactly, and thus it is super easy to feed the \textbf{exact} normal~$\vect n_{\Gamma} \ne \vect n_{\Gamma_{h}^2}$ to quadratures. Shall we do this?
+	\item It is always the case that integrands use~$\vect n_{\Gamma_{h}^2} \ne \vect n_{\Gamma_{h/m}^{2 \to 1}}$, and the actual domain of integration is~$\Gamma_{h/m}^{2 \to 1} \ne \Gamma_{h}^2$,
+	\item $\vect n_{\Gamma_{h}^2}$ is defined in~\eqref{gammah:n} and it is not a polynomial even locally, thus quadrature rules are never exact (although for $\vect P_2$\,--\,$P_1$ shape functions alone these quadratures are exact).
+	%\item In our examples we know~$\phi$ and~$\nabla \phi$ exactly, and thus it is super easy to feed the \textbf{exact} normal~$\vect n_{\Gamma} \ne \vect n_{\Gamma_{h}^2}$ to quadratures. Shall we do this?
 \end{itemize}
+
+\subsection{Using exact normals in integrands of~$\int_{\Gamma_{h/m}^{2 \to 1}}$ (updated summary)}
+
+It was quite easy to update~\eqref{mtx_exact} such that the exact normals w.r.t. piecewise linear surface domain of integration are used. \texttt{spatch} (section~\ref{subsec:integrals}) has a member function that gives \textbf{physical} normals to its triangles straightaway. Thus implementation of updated quadratures boiled down to constructing~\texttt{GridFunction} object (described in section~\ref{subsec:app}) out of these physical normals. Details of the implementation can be found in commit~\texttt{\href{https://github.com/56th/drops/commit/dacc440587a3f1ea56186fd8c1ff6b6e3ea4b730}{dacc440}}.
+
+Comments:
+\begin{itemize}
+	\item It is also easy to extend this approach s.t. $\Gamma_{h/m}^1 \ne \Gamma_{h/m}^{2 \rightarrow 1}$  is used (please see section~\ref{subsec:not} and then figures~\ref{fig:phi_exact} and~\ref{fig:phi_inexact}). There is no difference between~$\Gamma_{h/2}^{2 \rightarrow 1}$ and $\Gamma_{h/2}^1$. For $m > 2$, there is no difference between~$\Gamma_{h/m}^{2 \rightarrow 1}$ and $\Gamma_{h/m}^1$ if $\phi \in P^2$. Right now~$\Gamma_{h/m}^{2 \rightarrow 1}$ is implemented.
+	\item It is \textbf{not} that easy to use the exact normal w.r.t. piecewise linear surface domain of integration in volume integrals. Our guess is that it shall not be a problem (we can leave~$\vect n_{\Gamma_h^2}$ there),
+	\item It is \textbf{not} easy to build~$I_{h}^n(\phi)$ for~$n > 2$. It is \textbf{not} implemented in DROPS as for now.
+\end{itemize}
+As for now, the matrices in~\eqref{mtx} can also be assembled as
+\begin{align}\begin{split}\label{mtx_exact_2}
+	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &= 
+		\int^5_{\Gamma_{h/m}^{2 \to 1}} \big( E_{s,\,\textcolor{DarkGreen}{\Gamma_{h/m}^{2 \to 1}}}(\vect u) : E_{s,\,\textcolor{DarkGreen}{\Gamma_{h/m}^{2 \to 1}}}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma_{h}^2})\,(\vect v\cdot\vect n_{\Gamma_{h}^2}) \big) \diff{s} \\
+	&
+		+ \rho_u \int^5_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n_{\Gamma_{h}^2}}\cdot\frac{\partial \vect v}{\partial\vect n_{\Gamma_{h}^2}} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
+	\langle \vect B\,\vec{\vect u}, \vec{\vect q} \rangle &= 
+		-\int^5_{\Gamma_{h/m}^{2 \to 1}} q\,\Div_{\textcolor{DarkGreen}{\Gamma_{h/m}^{2 \to 1}}} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
+	\langle \vect M_0\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\int^5_{\Gamma_{h/m}^{2 \to 1}} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_n\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\rho_p \int^5_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\vect n_{\Gamma_{h}^2}} \frac{\partial q}{\partial\vect n_{\Gamma_{h}^2}} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_{\text{full}}\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\rho_p \int^5_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},
+\end{split}\end{align}
+Notations are as in~\eqref{mtx_exact}. Note that the ``$\tau$-term'' uses~$\vect n_{\Gamma_h^2}$. In order to switch between~\eqref{mtx_exact} and~\eqref{mtx_exact_2}, one modifies JSON input file: 
+\begin{lstlisting}
+// No_Bnd_Condition.json
+"Levelset": {
+// ...
+"NumbOfVirtualSubEdges" : 2,
+"UseExactNormals"       : "yes",
+// ...
+}
+\end{lstlisting}
+Here 2 corresponds to $m = 2$, and ``yes'' corresponds to~\eqref{mtx_exact_2}.
+
+\clearpage
+\begin{figure}[h!]
+	\par\bigskip
+	\centering
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.6]{patches_2.png}
+	\end{subfigure}%
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.6]{normals_2.png}
+	\end{subfigure}%
+	\par\bigskip
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.6]{patches_4.png}
+	\end{subfigure}%
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.6]{normals_4.png}
+	\end{subfigure}%
+	\par\bigskip
+	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^2 - 1$, $h = 8.33\times10^{-1}$. Top-left: $\Gamma_{h/2}^{2 \rightarrow 1} = \Gamma_{h/2}^1$ (different color corresponds to a different \texttt{spatch} $\gamma \in \Gamma_{h/2}^{2 \rightarrow 1}$ as described in section~\ref{subsec:integrals}). Top-right: a patch~$\gamma \in \Gamma_{h/2}^{2 \rightarrow 1}$ and its normals. Bottom-left and bottom-right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} = \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \in P^2$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} = \Gamma_{h/m}^1 \rightarrow \Gamma$ as $m \rightarrow \infty$ independent of~$h$}}
+	\label{fig:phi_exact}		
+\end{figure}
+\vfill
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.6]{patches_2_inexact.png}
+	\end{subfigure}%
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.6]{patches_4_inexact.png}
+	\end{subfigure}%
+	\par\bigskip
+	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^{1/2} - 1$, $h = 8.33\times10^{-1}$. Left: $\Gamma_{h/2}^{2 \rightarrow 1} = \Gamma_{h/2}^1$ (different color corresponds to a different \texttt{spatch} $\gamma \in \Gamma_{h/2}^{2 \rightarrow 1}$ as described in section~\ref{subsec:integrals}). Right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} \ne \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \not\in \bar{P}^2_h$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} \ne \Gamma_{h/m}^1$ for~$m > 2$, and $\Gamma_{h/m}^{2 \rightarrow 1} \rightarrow \Gamma_h^2 \ne \Gamma$ as $m \rightarrow \infty$ for fixed~$h$}}
+	\label{fig:phi_inexact}		
+\end{figure}
+\clearpage
+
+
+
+\subsection{Quadrature rules for the error computation}\label{subsec:err}
+
+When we first tried to test convergence for~\eqref{mtx_exact_2} in section~\ref{sec:conv}, we noticed that the~$\HOneSpace$-error of the velocity decays much slower than expected, whereas its~$\LTwoSpace$-error behaves as expected. Note that~$\HOneSpace$-error (for e.g. $\vect P_2$\,--\,$P_1$ FE) can be computed as~$\langle \vect w, \vect A_s\,\vect w \rangle^{1/2}$, $\vect w \coloneqq$ vector of d.o.f. corresponding to $\vect P^2_h$ interpolant $I_h^2(\vect u) - \vect u_h$, $\vect A_s \coloneqq$ matrix corresponding to the first term of~$\vect A$ in~\eqref{mtx_exact_2}. Thus the errors are approximated as
+\begin{align*}
+	\| \vect u - \vect u_h \|_{\HOneSpace} &= \| I^k_h(\vect u) - \vect u_h \|_{\HOneSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^{k}), \\
+	\| \vect u - \vect u_h \|_{\LTwoSpace} &= \| I^k_h(\vect u) - \vect u_h \|_{\LTwoSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^{k+1}), \\
+	\| p - p_h \|_{\LTwoSpace} &= \| I^1_h(p) - p_h \|_{\LTwoSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^2)
+\end{align*}
+for large enougn~$m$. Here $k = 1$ for~$\vect P_1$\,--\,$P_1$ FEM and $k = 2$ for~$\vect P_2$\,--\,$P_1$.
+
+\textbf{Interestingly enough}, DROPS implementation did not use the assembled matrices to compute errors (and normals that are \textit{different} from the ones in~$\vect A_s$ were used). We corrected it in commit~\texttt{\href{https://github.com/56th/drops/commit/68443b0a678447ba8b3e7e0af1621e6cd402e5d1}{68443b0}}:
+\begin{lstlisting}
+// surfnavierstokes.cpp
+// ...
+VectorCL vSolMinusV = vSol.Data - v.Data, pSolMinusP = pSol.Data - p.Data;
+auto velL2          = sqrt(dot(v.Data, M.Data * v.Data));
+auto velNormalL2    = sqrt(dot(v.Data, S.Data * v.Data));
+auto velH1err       = sqrt(dot(vSolMinusV, A.Data * vSolMinusV));
+auto velL2err       = sqrt(dot(vSolMinusV, M.Data * vSolMinusV));
+auto preL2          = sqrt(dot(p.Data, Schur.Data * p.Data));
+auto preL2err       = sqrt(dot(pSolMinusP, Schur.Data * pSolMinusP));
+// ...
+\end{lstlisting}
 
 \bibliographystyle{plain}
 \bibliography{bibl}
