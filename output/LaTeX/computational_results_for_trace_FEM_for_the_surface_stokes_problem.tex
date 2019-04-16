@@ -390,7 +390,7 @@ This way we ``extend''~\eqref{exact_soln} radially. It is useful since we use \t
 
 \subsection{$\text{P}_1$\,--\,$P_1$ Trace\,FEM}
 
-Here we compare approaches~\eqref{mtx_exact} and~\eqref{mtx_exact_2}. We use two virtual refinements for surface integrals, $m = 2$, so we have $\Gamma_{h/2}^{2 \to 1} = \Gamma_{h/2}^1$ (see~\eqref{gammah} and~\eqref{gammah2}). We use the full stabilization matrix~$\vect C_{\text{full}}$. Note that~$\phi \in P_2$ in~\eqref{exact_soln}, and hence~$\Gamma_h^2 = \Gamma$. Thus~\eqref{mtx_exact} boils down to
+Here we compare approaches~\eqref{mtx_exact} and~\eqref{mtx_exact_2}. We use one virtual refinement for surface integrals, $m = 2$, so we have $\Gamma_{h/2}^{2 \to 1} = \Gamma_{h/2}^1$ (see~\eqref{gammah} and~\eqref{gammah2}). We use the full stabilization matrix~$\vect C_{\text{full}}$. Note that~$\phi \in P_2$ in~\eqref{exact_soln}, and hence~$\Gamma_h^2 = \Gamma$. Thus~\eqref{mtx_exact} boils down to
 \begin{align}\begin{split}\label{mtx_exact_p1}
 	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &= 
 		\int^5_{\Gamma_{h/2}^1} \big( E_{s,\,\Gamma}(\vect u) : E_{s,\,\Gamma}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma})\,(\vect v\cdot\vect n_{\Gamma}) \big) \diff{s} \\
