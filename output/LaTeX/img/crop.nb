@@ -1,0 +1,89 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      3076,         81]
+NotebookOptionsPosition[      2424,         64]
+NotebookOutlinePosition[      2758,         79]
+CellTagsIndexPosition[      2715,         76]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"SetDirectory", "[", 
+  RowBox[{"NotebookDirectory", "[", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.764606399663334*^9, 3.764606449762044*^9}},
+ CellLabel->"In[63]:=",ExpressionUUID->"45ea0f00-4a83-44e0-8c69-2492959f2a6e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"path", "=", "\"\<shift_0.2.png\>\""}], ";"}]], "Input",
+ CellChangeTimes->{{3.764606345371087*^9, 3.7646063555547113`*^9}, 
+   3.7646063956866207`*^9, {3.7646068593204527`*^9, 3.7646069489264727`*^9}},
+ CellLabel->"In[64]:=",ExpressionUUID->"e139301c-19f2-491f-998d-f86d9abeb722"],
+
+Cell[BoxData[
+ RowBox[{"img", "=", 
+  RowBox[{"ImageCrop", "[", 
+   RowBox[{"Import", "[", "path", "]"}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.764606187539674*^9, 3.7646061992456837`*^9}, {
+   3.7646062494508677`*^9, 3.764606250882571*^9}, 3.764606364223567*^9, {
+   3.764606498088059*^9, 3.76460649878371*^9}, {3.764606823537816*^9, 
+   3.764606840192912*^9}},
+ CellLabel->"In[65]:=",ExpressionUUID->"247fb74a-a094-496d-8bba-67478a80cb3f"],
+
+Cell[BoxData[
+ RowBox[{"newPath", "=", 
+  RowBox[{"StringRiffle", "[", 
+   RowBox[{
+    RowBox[{"Insert", "[", 
+     RowBox[{
+      RowBox[{"StringSplit", "[", 
+       RowBox[{"path", ",", "\"\<.\>\""}], "]"}], ",", "\"\<cropped\>\"", ",", 
+      RowBox[{"-", "2"}]}], "]"}], ",", "\"\<.\>\""}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.764606502776517*^9, 3.764606545985099*^9}, {
+  3.76460658178386*^9, 3.764606624264513*^9}, {3.764606752705027*^9, 
+  3.764606774445211*^9}},
+ CellLabel->"In[66]:=",ExpressionUUID->"5b6e3dc9-85cd-4363-9dca-a2ff185c994c"],
+
+Cell[BoxData[
+ RowBox[{"Export", "[", 
+  RowBox[{"newPath", ",", "img"}], "]"}]], "Input",
+ CellChangeTimes->{{3.7646063372476263`*^9, 3.764606340182727*^9}, {
+  3.764606779725575*^9, 3.764606792263859*^9}},
+ CellLabel->"In[67]:=",ExpressionUUID->"f6851b84-e1a4-4f96-a6f0-83484e5911e8"]
+},
+WindowSize->{1853, 1145},
+WindowMargins->{{Automatic, 0}, {0, Automatic}},
+FrontEndVersion->"11.3 for Linux x86 (64-bit) (March 6, 2018)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 249, 4, 31, "Input",ExpressionUUID->"45ea0f00-4a83-44e0-8c69-2492959f2a6e"],
+Cell[810, 26, 315, 5, 31, "Input",ExpressionUUID->"e139301c-19f2-491f-998d-f86d9abeb722"],
+Cell[1128, 33, 444, 8, 31, "Input",ExpressionUUID->"247fb74a-a094-496d-8bba-67478a80cb3f"],
+Cell[1575, 43, 556, 12, 31, "Input",ExpressionUUID->"5b6e3dc9-85cd-4363-9dca-a2ff185c994c"],
+Cell[2134, 57, 286, 5, 31, "Input",ExpressionUUID->"f6851b84-e1a4-4f96-a6f0-83484e5911e8"]
+}
+]
+*)
+

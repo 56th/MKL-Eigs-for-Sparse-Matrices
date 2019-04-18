@@ -31,6 +31,7 @@
 \usepackage{subcaption}
 \usepackage{graphicx}
 \graphicspath{{img/}} % includegraphics path
+% \usepackage[export]{adjustbox} % https://tex.stackexchange.com/questions/20640/how-to-add-border-for-an-image
 \newcommand{\includegraphicsw}[2][1.]{\includegraphics[width=#1\linewidth]{#2}}
 \newcommand{\svginput}[1]{\input{img/#1}} % pdf_tex path
 \newcommand{\svginputw}[2][\linewidth]{\def\svgwidth{#1}\input{img/#2}} % pdf_tex path
@@ -106,17 +107,17 @@ respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega_\
 and $h$ is the typical mesh size for tetrahedra from~$\Omega^{\Gamma}_h$. $\Gamma$ is chosen either as the unit sphere or torus, $\Gamma = \sphere$ or $\Gamma = \tor$ (see Figure~\ref{fig:gamma}).
 
 We also define matrices 
-\begin{align}\begin{split}
-	\vect C_0 &\coloneqq \vect 0,\\
-	\vect M_n &\coloneqq \vect M_0 + \vect C_n,\\
-	\vect M_{\text{full}} &\coloneqq \vect M_0 + \vect C_{\text{full}}.
-\end{split}\end{align}
+\begin{equation}
+	\vect C_0 \coloneqq \vect 0,\quad
+	\vect M_n \coloneqq \vect M_0 + \vect C_n,\quad
+	\vect M_{\text{full}} \coloneqq \vect M_0 + \vect C_{\text{full}}.
+\end{equation}
 We are interested in (generalized) extreme eigenvalues of the pressure Schur complement matrices
-\begin{align}\label{schur}\begin{split}
-	\vect S_0 &\coloneqq \vect B\,\vect A^{-1}\,\vect B^{T},\\
-	\vect S_n &\coloneqq \vect S_0 + \vect C_n,\\
-	\vect S_{\text{full}} &\coloneqq \vect S_0 + \vect C_{\text{full}},
-\end{split}\end{align}
+\begin{align}\label{schur}
+	\vect S_0 \coloneqq \vect B\,\vect A^{-1}\,\vect B^{T},\quad
+	\vect S_n \coloneqq \vect S_0 + \vect C_n,\quad
+	\vect S_{\text{full}} \coloneqq \vect S_0 + \vect C_{\text{full}},
+\end{align}
 i.e. in solving
 \begin{equation}\label{problem}
 	\vect S_\star\,\vect x = \lambda\,\vect M_\star\,\vect x,
@@ -164,33 +165,33 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 	\centering
 	\begin{subfigure}{.33\linewidth}
 		\centering
-		\includegraphicsw{lvl1.png}
+		\includegraphicsw[.9]{{lvl1.cropped}.png}
 		\caption{$h = 8.33\times10^{-1}$}
 	\end{subfigure}%
 	\begin{subfigure}{.33\linewidth}
 		\centering
-		\includegraphicsw{lvl2.png}
+		\includegraphicsw[.9]{{lvl2.cropped}.png}
 		\caption{$h = 4.17\times10^{-1}$}
 	\end{subfigure}%
 	\begin{subfigure}{.33\linewidth}
 		\centering
-		\includegraphicsw{lvl3.png}
+		\includegraphicsw[.9]{{lvl3.cropped}.png}
 		\caption{$h = 2.08\times10^{-1}$}
 	\end{subfigure}
-	\par
+	\par\bigskip
 	\begin{subfigure}{.33\linewidth}
 		\centering
-		\includegraphicsw{tor_lvl3.png}
+		\includegraphicsw[.9]{{tor_lvl3.cropped}.png}
 		\caption{$h = 2.08\times10^{-1}$}
 	\end{subfigure}%
 	\begin{subfigure}{.33\linewidth}
 		\centering
-		\includegraphicsw{tor_lvl4.png}
+		\includegraphicsw[.9]{{tor_lvl4.cropped}.png}
 		\caption{$h = 1.04\times10^{-1}$}
 	\end{subfigure}%
 	\begin{subfigure}{.33\linewidth}
 		\centering
-		\includegraphicsw{tor_lvl5.png}
+		\includegraphicsw[.9]{{tor_lvl5.cropped}.png}
 		\caption{$h = 5.21\times10^{-2}$}
 	\end{subfigure}
 	\caption{First three mesh levels for~$\sphere$ (top) and $\tor$ (bottom)}
@@ -261,8 +262,6 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 
 \clearpage
 
-\clearpage
-
 \begin{table}[h]
 	\centering\small
 	\caption{Spectrum of~\eqref{problem} for $\vect P_2$\,--\,$P_1$} 
@@ -327,12 +326,12 @@ We construct the bulk mesh~$\Omega_h^\Gamma$ and then perform the assembly of ma
 	\centering
 	\begin{subfigure}{.5\linewidth}
 		\centering
-		\includegraphicsw{{shift_0.0}.png}
+		\includegraphicsw[.7]{{shift_0.0.cropped}.png}
 		\caption{$\sphere$}
 	\end{subfigure}%
 	\begin{subfigure}{.5\linewidth}
 		\centering
-		\includegraphicsw{{shift_0.2}.png}
+		\includegraphicsw[.7]{{shift_0.2.cropped}.png}
 		\caption{$\sphere + \alpha\,\vect s$}
 	\end{subfigure}%
 	\caption{The unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (0, 1, 1)^T/\sqrt{2}$, $\alpha = 0.2$, and $h = 2.08\times10^{-1}$. The bulk mesh~$\Omega_\Gamma^h$ is computed for~$\sphere$ and then used for~$\sphere + \alpha\,\vect s$}
@@ -792,7 +791,7 @@ When we first tried to test convergence for~\eqref{mtx_exact_2} in section~\ref{
 	\| \vect u - \vect u_h \|_{\LTwoSpace} &= \| I^k_h(\vect u) - \vect u_h \|_{\LTwoSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^{k+1}), \\
 	\| p - p_h \|_{\LTwoSpace} &= \| I^1_h(p) - p_h \|_{\LTwoSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^2)
 \end{align*}
-for large enougn~$m$. Here $k = 1$ for~$\vect P_1$\,--\,$P_1$ FEM and $k = 2$ for~$\vect P_2$\,--\,$P_1$.
+for large enough~$m$. Here $k = 1$ for~$\vect P_1$\,--\,$P_1$ FEM and $k = 2$ for~$\vect P_2$\,--\,$P_1$.
 
 \textbf{Interestingly enough}, DROPS implementation did not use the assembled matrices to compute errors (and normals that are \textit{different} from the ones in~$\vect A_s$ were used). We corrected it in commit~\texttt{\href{https://github.com/56th/drops/commit/68443b0a678447ba8b3e7e0af1621e6cd402e5d1}{68443b0}}:
 \begin{lstlisting}
