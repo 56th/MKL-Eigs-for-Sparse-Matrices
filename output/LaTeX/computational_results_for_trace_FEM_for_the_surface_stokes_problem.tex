@@ -520,6 +520,29 @@ We use the normal stabilization matrix~$\vect C_n$. We stick to approach~\eqref{
 \begin{table}[h!]
 	\centering\small
 	\caption{Convergence results. $\tau = h^{-3}$, $\rho_u = \rho_p = h$}
+	\label{tab:p2p1_conv_new}
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|c|}
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_normals=exact_shift=0.0h_conv_table_new_tau.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 4mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c||c|}
+			\hline
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwoSpace}$ & Order & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P2P1_normals=exact_shift=0.0h_iters_table_new_tau.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}
+
+\begin{table}[h!]
+	\centering\small
+	\caption{Convergence results. $\tau = 0.1\,h^{-3}$, $\rho_u = \rho_p = h$}
 	\label{tab:p2p1_conv}
 	\begin{subtable}{1.\linewidth}\centering
 		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|c|}
