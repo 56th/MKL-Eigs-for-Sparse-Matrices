@@ -494,8 +494,6 @@ The errors in Table~\ref{tab:p1p1_conv} are computed as explained in section~\re
 
 We use the normal stabilization matrix~$\vect C_n$. We stick to approach~\eqref{mtx_exact_2}. We choose~$m = O(h^{-1/2})$ so that the geometric error is~$O(h^3)$. Thus $m = 2, 2, 4, 4, 6, 8, 10, 14$ for meshlevel~1, 2 and so forth, respectively.
 
-For statistics: using 64 CPUs, computation of the meshlevel~3 ($h = 2.08\times10^{-1}$) takes~${\sim}1$ minute, meshlevel~4 takes~${\sim}7$ minutes, meshlevel~5 takes~${\sim}50$ minutes, and meshlevel~6 takes~$4.8$ hours.
-
 \begin{table}[h!]
 	\centering\small
 	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = \rho_p = h$}
@@ -541,6 +539,8 @@ For statistics: using 64 CPUs, computation of the meshlevel~3 ($h = 2.08\times10
 		\end{tabular}
 	\end{subtable}
 \end{table}
+
+For statistics: using 64 CPUs, computation of the meshlevel~3 ($h = 2.08\times10^{-1}$) takes~${\sim}1$ minute, meshlevel~4 takes~${\sim}7$ minutes, meshlevel~5 takes~${\sim}50$ minutes, meshlevel~6 takes~$4.8$ hours, and meshlevel~7 takes~${\sim}21.3$ hours.
 
 \section{Notes on DROPS implementation}
 
