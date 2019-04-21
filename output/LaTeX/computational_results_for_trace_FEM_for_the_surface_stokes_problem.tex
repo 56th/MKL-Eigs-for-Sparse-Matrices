@@ -492,7 +492,19 @@ The errors in Table~\ref{tab:p1p1_conv} are computed as explained in section~\re
 
 \subsection{$\text{P}_2$\,--\,$P_1$ Trace\,FEM}
 
-We use the normal stabilization matrix~$\vect C_n$. We stick to approach~\eqref{mtx_exact_2}. We choose~$m = O(h^{-1/2})$ so that the geometric error is~$O(h^3)$. Thus $m = 2, 2, 4, 4, 6, 8, 10, 14$ for meshlevel~1, 2 and so forth, respectively.
+We use the normal stabilization matrix~$\vect C_n$. We choose~$m = O(h^{-1/2})$ so that the geometric error is~$O(h^3)$. Thus $m = 2, 2, 4, 4, 6, 8, 10, 14$ for meshlevel~1, 2 and so forth, respectively. We stick to approach~\eqref{mtx_exact_2}, so we have
+\begin{align}\begin{split}\label{mtx_exact_2_p2}
+	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &= 
+		\int^5_{\Gamma_{h/m}^1} \big( E_{s,\,\Gamma_{h/m}^1}(\vect u) : E_{s,\,\Gamma_{h/m}^1}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma})\,(\vect v\cdot\vect n_{\Gamma}) \big) \diff{s} \\
+	&
+		+ \rho_u \int^5_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n_{\Gamma}}\cdot\frac{\partial \vect v}{\partial\vect n_{\Gamma}} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
+	\langle \vect B\,\vec{\vect u}, \vec{\vect q} \rangle &= 
+		-\int^5_{\Gamma_{h/m}^1} q\,\Div_{\Gamma_{h/m}^1} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
+	\langle \vect M_0\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\int^5_{\Gamma_{h/m}^1} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+	\langle \vect C_n\,\vec{\vect p}, \vec{\vect q} \rangle &=
+		\rho_p \int_{\Omega^{\Gamma}_h}^5 \frac{\partial p}{\partial\vect n_{\Gamma}} \frac{\partial q}{\partial\vect n_{\Gamma}} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}}.
+\end{split}\end{align}
 
 \begin{table}[h!]
 	\centering\small
