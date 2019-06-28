@@ -21,7 +21,7 @@
 
 \usepackage{geometry}
 \newgeometry{
-	left=1cm, right=1cm, top=.8cm, bottom=.8cm,
+	left=.8cm, right=.8cm, top=.8cm, bottom=.8cm,
 	includefoot, heightrounded
 }
 
@@ -39,6 +39,7 @@
 % tables
 \usepackage{multirow}
 \usepackage{hhline}
+\usepackage{float} % for H
 
 % bold for everything
 \usepackage{bm}
@@ -49,9 +50,12 @@
 \newcommand*\Diff[1]{\mathop{}\!\mathrm{d^#1}}
 
 \DeclareMathOperator{\Div}{div}
+\DeclareMathOperator{\Dist}{dist}
 \newcommand{\sphere}{{\Gamma_{\text{sph}}}}
 \newcommand{\tor}{{\Gamma_{\text{tor}}}}
 
+\newcommand{\HOne}{{\mathbb H^1}}
+\newcommand{\LTwo}{{\mathbb L^2}}
 \newcommand{\LTwoSpace}[1][\Gamma]{{\mathbb L^2\left({#1}\right)}}
 \newcommand{\HOneSpace}[1][\Gamma]{{\mathbb H^1\left({#1}\right)}}
 
@@ -374,18 +378,52 @@ We construct the bulk mesh~$\Omega_h^\Gamma$ and then perform the assembly of ma
 
 \section{Convergence results}\label{sec:conv}
 
-We solve model problem from~\cite[p.\,20]{surfstokes}. We set
-\begin{align}\begin{split}\label{exact_soln}
-	\tilde{\vect u}(x, y, z) &\coloneqq (-z^2, y, x)^T, \\
-	\tilde p(x, y, z) &\coloneqq x\,y^2 + z, \\
-	\phi(\vect x) &\coloneqq \|\vect x\|^2 - 1.
-\end{split}\end{align}
+\subsection{Manufactured solution}
+
+We solve model problem from~\cite[p.\,20]{surfstokes}, $\Gamma = \sphere$\footnotemark{}. We set
+\begin{equation}\label{exact_soln}
+	\tilde{\vect u}(x, y, z) \coloneqq (-z^2, y, x)^T, \quad
+	\tilde p(x, y, z) \coloneqq x\,y^2 + z, \quad
+	\phi(\vect x) \coloneqq \|\vect x\|^2 - 1.
+\end{equation}
 The exact solution on the unit sphere is chosen as 
 \begin{equation}\label{exact_soln_2}
-	\vect u(\vect x) \coloneqq \vect P\,\tilde{\vect u}\big(\frac{\vect x}{\|\vect x\|}\big), \quad
-	p(\vect x) \coloneqq \tilde p\big(\frac{\vect x}{\|\vect x\|}\big).
+	\vect u \coloneqq \vect P\,\tilde{\vect u}^e, \quad
+	p \coloneqq \tilde p^e.
 \end{equation}
-This way we ``extend''~\eqref{exact_soln} radially. It is useful since we use \textit{the approximation} of~$\sphere$.
+
+\footnotetext{In~\cite{surfstokes} they use~$\vect u \coloneqq \vect P\,\tilde{\vect u}$, i.e. $\vect u \ne \vect u^e$. I prefer~$\vect u \equiv \vect u^e$ as in~\cite{veclaplace}.}
+
+Thus we have~$\int_\Gamma p \diff{\vect x} = 0$, $p \equiv p^e$, $\vect u \equiv \vect u^e$ in $\mathcal O(\Gamma)$, and $\vect u$ is a tangential field. % Note that $\vect u \ne \vect u^e$. (I do not know why whoever implemented this test did not choose $\vect u(\vect x) \coloneqq \vect P(\vect x)\,\tilde{\vect u}^e(\vect x)$ instead, but this is how it is. I leave this choice since I have a lot of tables already computed with~\eqref{exact_soln_2}.)
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.8]{u_soln.png}
+	\end{subfigure}%
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.8]{p_soln.png}
+	\end{subfigure}%
+	\caption{Exact velocity solution (Left) and pressure solution (Right) as in~\eqref{exact_soln_2}}
+	\label{fig:soln}		
+\end{figure}
+
+We have
+\begin{align}
+	\vect n_{\sphere}(\vect x) &= \|\vect x\|^{-1}\,\vect x = \vect n_{\sphere}^e(\vect x), \\
+	\vect P_{\sphere}(\vect x) &= \|\vect x\|^{-2}\begin{pmatrix}
+		y^2+z^2 & -x y & -x z \\
+		-x y & x^2+z^2 & -y z \\
+		-x z & -y z & x^2+y^2 
+	\end{pmatrix} = \vect P^e_{\sphere}(\vect x), \\
+	\vect H_{\sphere}(\vect x) &= \|\vect x\|^{-3}\begin{pmatrix}
+		y^2+z^2 & -x y & -x z \\
+		-x y & x^2+z^2 & -y z \\
+		-x z & -y z & x^2+y^2 \\
+	\end{pmatrix} \ne \vect H^e_{\sphere}(\vect x) = \vect P_{\sphere}(\vect x).
+\end{align}
 
 \subsection{$\text{P}_1$\,--\,$P_1$ Trace\,FEM}
 
@@ -418,8 +456,8 @@ and e.g. the integrand that involves $E_{s,\,\Gamma} \equiv E_s$ is exact. Simil
 
 For statistics: using 64 CPUs, computation of the meshlevel~6 ($h = 2.6\times10^{-2}$) takes~${\sim}14$ minutes, meshlevel~7 takes~${\sim}75$ minutes, and meshlevel~8 takes~${\sim}7.3$ hours.
 
-\begin{table}[h!]
-	\centering\small
+\begin{table}[H]
+	\centering\footnotesize
 	\caption{Convergence results. Matrices are assembled as in~\eqref{mtx_exact_p1} (top table) and~\eqref{mtx_exact_2_p1} (bottom table)}
 	\label{tab:p1p1_conv}
 	\begin{subtable}{1.\linewidth}\centering
@@ -441,8 +479,8 @@ For statistics: using 64 CPUs, computation of the meshlevel~6 ($h = 2.6\times10^
 	\end{subtable}
 \end{table}
 
-\begin{table}[h!]
-	\centering\small
+\begin{table}[H]
+	\centering\footnotesize
 	\caption{Solver statistics for~\eqref{mtx_exact_p1} (left table) and~\eqref{mtx_exact_2_p1} (right table)}
 	\label{tab:p1p1_iters}
 	\begin{subtable}{.5\linewidth}\centering
@@ -488,11 +526,53 @@ For statistics: using 64 CPUs, computation of the meshlevel~6 ($h = 2.6\times10^
 
 The errors in Table~\ref{tab:p1p1_conv} are computed as explained in section~\ref{subsec:err}.
 
-\clearpage
-
 \subsection{$\text{P}_2$\,--\,$P_1$ Trace\,FEM}
 
-We use the normal stabilization matrix~$\vect C_n$. We choose~$m = O(h^{-1/2})$ so that the geometric error is~$O(h^3)$. Thus $m = 2, 2, 4, 4, 6, 8, 10, 14$ for meshlevel~1, 2 and so forth, respectively. We stick to approach~\eqref{mtx_exact_2}, so we have
+We consider two choices for virtual refinement: $m \propto h^{-1/2}$ and $m \propto h^{-1}$. The first choice assures $h^3$-accurate approximation of~$\Gamma$ and $h^{3/2}$ accurate approximation of the normal vector, whereas the second choice assures $h^4$- and $h^2$-approximations. We refer to Figure~\ref{fig:m}. 
+
+Next we compare inconsistent and consistent Trace\,FEM penalty formulations. 
+
+\begin{figure}[H]
+	\centering
+	%	\begin{subfigure}{.5\linewidth}
+	%		\centering
+	%		\includegraphicsw[1.]{m_plot_old.png}
+	%	\end{subfigure}%
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[1.]{m_plot_new.png}
+	\end{subfigure}%
+	\quad
+	\begin{subfigure}{.4\linewidth}
+		$\vect m_{1/2} \coloneqq \{2, \textcolor{Gray}{4}, 4, 6, 8, 12, 18, 24\}$, 
+		
+		$\vect m_{1} \coloneqq \{\textcolor{Gray}{0}, 2, 4, 8, 16, 32, 64, 128\}$.
+		\vskip .3cm
+		We skip level~$h = 4.2\times 10^{-1}$ for~$\vect m_{1/2}$ and level~$h = 8.3\times 10^{-1}$ for~$\vect m_1$ so that $m \in \vect m_{1/2}$ or $\vect m_1$ behaves proportionally to~$h^{-1/2}$ and~$h^{-1}$, respectively
+	\end{subfigure}%
+	\caption{Virtual refinement parameter $m$ for~$\Gamma_{h/m}^{2\to 1}$}
+	\label{fig:m}		
+\end{figure}
+
+\begin{table}[H]
+	\centering\footnotesize
+	\caption{Errors for normals and shape operator. Note that $\vect n_{\Gamma^2_h} = \vect n_\Gamma^e$ for our choice of~$\phi$ in~\eqref{exact_soln}, and the error of normals is zero (as expected). Note also that $\vect n_{\Gamma^{2\to 1}_{h/m}} = \vect n_{\Gamma^1_{h/m}}$ for our choice of~$\phi$, and $\vect n_{\Gamma^1_{h/m}}$ converges to $\vect n_\Gamma$ as one increases~$m$ for fixed~$h$}
+	\label{tab:shape_normal_conv}
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.4]{|c||c||c|c||c|c|}
+			\hline
+			\multicolumn{6}{|c|}{$m \in \vect m_1$ as in Figure~\ref{fig:m}} \\
+			\hline
+			$h$ & $\|\vect n^e_\Gamma - \vect n_{\Gamma_{h}^2}\|_{\LTwoSpace[\Gamma_{h/m}^1]}$ & $\|\vect n^e_\Gamma - \vect n_{\Gamma_{h/m}^1} \|_{\LTwoSpace[\Gamma_{h/m}^1]}$ & Order & $\|\vect H_{\Gamma}^e - \vect H_{\Gamma^2_h}\|_{\LTwoSpace[\Gamma_{h/m}^1]}$ & Order \\
+			\hline
+			\input{sphere_2_normal_and_shape_errs_m=1_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}
+
+\subsubsection{Inconsistent penalty formulation}
+
+We use the normal stabilization matrix~$\vect C_n$. We stick to the approach~\eqref{mtx_exact_2}, so with~$\phi$ in~\eqref{exact_soln} we have
 \begin{align}\begin{split}\label{mtx_exact_2_p2}
 	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &= 
 		\int^5_{\Gamma_{h/m}^1} \big( E_{s,\,\Gamma_{h/m}^1}(\vect u) : E_{s,\,\Gamma_{h/m}^1}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma})\,(\vect v\cdot\vect n_{\Gamma}) \big) \diff{s} \\
@@ -506,76 +586,345 @@ We use the normal stabilization matrix~$\vect C_n$. We choose~$m = O(h^{-1/2})$ 
 		\rho_p \int_{\Omega^{\Gamma}_h}^5 \frac{\partial p}{\partial\vect n_{\Gamma}} \frac{\partial q}{\partial\vect n_{\Gamma}} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}}.
 \end{split}\end{align}
 
-\begin{table}[h!]
-	\centering\small
-	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = \rho_p = h$}
-	\label{tab:p2p1_conv_old}
+\begin{table}[H]
+	\centering\footnotesize
+	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = h$, $\rho_p = h$. Matrices are assembled as in~\eqref{mtx_exact_2_p2}}
+	\label{tab:p2p1_h}
 	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|c|}
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
 			\hline
-			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+			\multicolumn{7}{|c|}{$m \in \vect m_1$ as in Figure~\ref{fig:m}} \\
 			\hline
-			\input{sphere_2_P2P1_normals=exact_shift=0.0h_conv_table_old_tau.tex}
+			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=1_shift=0.0h_form=inconsistent_m=1_vstab=1_conv_table.tex}
 		\end{tabular}
 	\end{subtable}
-	\vskip 4mm	
+	\vskip 2mm	
 	\begin{subtable}{1.\linewidth}\centering
 		\begin{tabular}[1.3]{|c||c|c||c||c|}
 			\hline
-			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwoSpace}$ & Order & Outer iterations & Residual norm \\
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
 			\hline
-			\input{sphere_2_P2P1_normals=exact_shift=0.0h_iters_table_old_tau.tex}
+			\input{sphere_2_P2P1_patchnormals=1_shift=0.0h_form=inconsistent_m=1_vstab=1_iters_table.tex}
 		\end{tabular}
 	\end{subtable}
 \end{table}
 
-\begin{table}[h!]
-	\centering\small
-	\caption{Convergence results. $\tau = h^{-3}$, $\rho_u = \rho_p = h$}
-	\label{tab:p2p1_conv_new}
-	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|c|}
-			\hline
-			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
-			\hline
-			\input{sphere_2_P2P1_normals=exact_shift=0.0h_conv_table_new_tau.tex}
-		\end{tabular}
-	\end{subtable}
-	\vskip 4mm	
-	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c||c|}
-			\hline
-			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwoSpace}$ & Order & Outer iterations & Residual norm \\
-			\hline
-			\input{sphere_2_P2P1_normals=exact_shift=0.0h_iters_table_new_tau.tex}
-		\end{tabular}
-	\end{subtable}
-\end{table}
-
-\begin{table}[h!]
-	\centering\small
-	\caption{Convergence results. $\tau = 0.1\,h^{-3}$, $\rho_u = \rho_p = h$}
-	\label{tab:p2p1_conv}
-	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|c|}
-			\hline
-			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
-			\hline
-			\input{sphere_2_P2P1_normals=exact_shift=0.0h_conv_table.tex}
-		\end{tabular}
-	\end{subtable}
-	\vskip 4mm	
-	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c||c|}
-			\hline
-			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwoSpace}$ & Order & Outer iterations & Residual norm \\
-			\hline
-			\input{sphere_2_P2P1_normals=exact_shift=0.0h_iters_table.tex}
-		\end{tabular}
-	\end{subtable}
-\end{table}
+%We use the normal stabilization matrix~$\vect C_n$. We choose~$m = O(h^{-1/2})$ so that the geometric error is~$O(h^3)$. Thus $m = 2, 2, 4, 4, 6, 8, 10, 14$ for meshlevel~1, 2 and so forth, respectively. We stick to approach~\eqref{mtx_exact_2}, so we have
+%\begin{align}\begin{split}\label{mtx_exact_2_p2}
+%	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &= 
+%		\int^5_{\Gamma_{h/m}^1} \big( E_{s,\,\Gamma_{h/m}^1}(\vect u) : E_{s,\,\Gamma_{h/m}^1}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_{\Gamma})\,(\vect v\cdot\vect n_{\Gamma}) \big) \diff{s} \\
+%	&
+%		+ \rho_u \int^5_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n_{\Gamma}}\cdot\frac{\partial \vect v}{\partial\vect n_{\Gamma}} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
+%	\langle \vect B\,\vec{\vect u}, \vec{\vect q} \rangle &= 
+%		-\int^5_{\Gamma_{h/m}^1} q\,\Div_{\Gamma_{h/m}^1} \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
+%	\langle \vect M_0\,\vec{\vect p}, \vec{\vect q} \rangle &=
+%		\int^5_{\Gamma_{h/m}^1} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+%	\langle \vect C_n\,\vec{\vect p}, \vec{\vect q} \rangle &=
+%		\rho_p \int_{\Omega^{\Gamma}_h}^5 \frac{\partial p}{\partial\vect n_{\Gamma}} \frac{\partial q}{\partial\vect n_{\Gamma}} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}}.
+%\end{split}\end{align}
+%
+%\begin{table}[h!]
+%	\centering\footnotesize
+%	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = \rho_p = h$}
+%	\label{tab:p2p1_conv_old}
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|c|}
+%			\hline
+%			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_conv_table_old_tau.tex}
+%		\end{tabular}
+%	\end{subtable}
+%	\vskip 2mm	
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c||c|}
+%			\hline
+%			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwoSpace}$ & Order & Outer iterations & Residual norm \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_iters_table_old_tau.tex}
+%		\end{tabular}
+%	\end{subtable}
+%\end{table}
+%
+%\begin{table}[h!]
+%	\centering\footnotesize
+%	\caption{Convergence results. $\tau = h^{-3}$, $\rho_u = \rho_p = h$}
+%	\label{tab:p2p1_conv_new}
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|c|}
+%			\hline
+%			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_conv_table_new_tau.tex}
+%		\end{tabular}
+%	\end{subtable}
+%	\vskip 2mm	
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c||c|}
+%			\hline
+%			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwoSpace}$ & Order & Outer iterations & Residual norm \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_iters_table_new_tau.tex}
+%		\end{tabular}
+%	\end{subtable}
+%\end{table}
+%
+%\begin{table}[h!]
+%	\centering\footnotesize
+%	\caption{Convergence results. $\tau = 0.1\,h^{-3}$, $\rho_u = \rho_p = h$}
+%	\label{tab:p2p1_conv}
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|c|}
+%			\hline
+%			$h$ & $\|\vect u - \vect u_h\|_{\HOneSpace}$ & Order & $\|\vect u - \vect u_h\|_{\LTwoSpace}$ & Order & $\|p - p_h\|_{\LTwoSpace}$ & Order \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_conv_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%	\vskip 2mm	
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c||c|}
+%			\hline
+%			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwoSpace}$ & Order & Outer iterations & Residual norm \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_iters_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%\end{table}
 
 For statistics: using 64 CPUs, computation of the meshlevel~3 ($h = 2.08\times10^{-1}$) takes~${\sim}1$ minute, meshlevel~4 takes~${\sim}7$ minutes, meshlevel~5 takes~${\sim}50$ minutes, meshlevel~6 takes~$4.8$ hours, and meshlevel~7 takes~${\sim}21.3$ hours.
+
+\subsubsection{Consistent penalty formulation}
+
+We consider the same formulation as in~\eqref{mtx_exact_2_p2}, but with the first term in the definition of~$\vect A$ changed as
+\begin{equation}\label{mtx_exact_2_cons}
+	\int^5_{\Gamma_{h/m}^{2 \to 1}} \big( E_{s,\,\Gamma_{h/m}^{2 \to 1}}(\vect u) - (\vect u\cdot\vect n_{\Gamma_{h/m}^{2 \to 1}})\,\vect H_{\Gamma_h^2} \big) : \big( E_{s,\,\Gamma_{h/m}^{2 \to 1}}(\vect v) - (\vect v\cdot\vect n_{\Gamma_{h/m}^{2 \to 1}})\,\vect H_{\Gamma_h^2} \big) \diff{s},
+\end{equation}
+Shape operator~$\vect H_{\Gamma_h^2}$ is computed as explained in Section~\ref{sec:shape}. Given~$\phi$ in~\eqref{exact_soln}, \eqref{mtx_exact_2_cons} boils down to
+\begin{equation*}
+	\int^5_{\Gamma_{h/m}^1} \big( E_{s,\,\Gamma_{h/m}^1}(\vect u) - (\vect u\cdot\vect n_{\Gamma_{h/m}^1})\,\vect H_{\Gamma} \big) : \big( E_{s,\,\Gamma_{h/m}^1}(\vect v) - (\vect v\cdot\vect n_{\Gamma_{h/m}^1})\,\vect H_{\Gamma} \big) \diff{s}.
+\end{equation*}
+Convergence results for~\eqref{mtx_exact_2_cons} are presented in Tables~\ref{tab:p2p1_cons_h}\,--\,\ref{tab:p2p1_cons_h^-1}.
+
+We also consider the modified version of~\eqref{mtx_exact_2_cons}
+\begin{equation}\label{mtx_exact_2_cons_upd}
+	\int^5_{\Gamma_{h/m}^{2 \to 1}} \big( E_{s,\,\Gamma_{h/m}^{2 \to 1}}(\vect u) - (\vect u\cdot\vect n_{\Gamma_h^2})\,\vect H_{\Gamma_h^2} \big) : \big( E_{s,\,\Gamma_{h/m}^{2 \to 1}}(\vect v) - (\vect v\cdot\vect n_{\Gamma_h^2})\,\vect H_{\Gamma_h^2} \big) \diff{s}.
+\end{equation}
+Convergence results for~\eqref{mtx_exact_2_cons_upd} are presented in Table~\ref{tab:p2p1_cons_upd_h^-1}.
+
+For statistics: using 80 CPUs, computation of the meshlevel~7 ($h = 1.3\times10^{-2}$) takes~${\sim}74.3$ hours with $m = 64$ (computation also involves errors for normals and the shape operator).
+
+%We consider the same formulations as in~\eqref{mtx_exact}--\eqref{mtx_exact_2}, but with the first term in the definition of~$\vect A$ changed as
+%\begin{equation}\label{mtx_exact_2_cons}
+%	\int^5_{\Gamma_{h/m}^{2 \to 1}} \big( E_{s,\,\Gamma_{h/m}^{2 \to 1}}(\vect u) - (\vect u\cdot\vect n_{\Gamma_{h/m}^{2 \to 1}})\,\vect H_{\Gamma_h^2} \big) : \big( E_{s,\,\Gamma_{h/m}^{2 \to 1}}(\vect v) - (\vect v\cdot\vect n_{\Gamma_{h/m}^{2 \to 1}})\,\vect H_{\Gamma_h^2} \big) \diff{s},
+%\end{equation}
+%or 
+%\begin{equation}\label{mtx_exact_cons}
+%	\int^5_{\Gamma_{h/m}^{2 \to 1}} \big( E_{s,\,\Gamma_h^2}(\vect u) - (\vect u\cdot\vect n_{\Gamma_h^2})\,\vect H_{\Gamma_h^2} \big) : \big( E_{s,\,\Gamma_h^2}(\vect v) - (\vect v\cdot\vect n_{\Gamma_h^2})\,\vect H_{\Gamma_h^2} \big) \diff{s}.
+%\end{equation}
+%Shape operator is computed as explained in Section~\ref{sec:shape}. Approach~\eqref{mtx_exact_2_cons} corresponds to~\eqref{mtx_exact_2}, and~\eqref{mtx_exact_cons} corresponds to~\eqref{mtx_exact}. Given~$\phi$ in~\eqref{exact_soln}, \eqref{mtx_exact_2_cons} and \eqref{mtx_exact_cons} boil down to
+%\begin{equation*}
+%	\int^5_{\Gamma_{h/m}^1} \big( E_{s,\,\Gamma_{h/m}^1}(\vect u) - (\vect u\cdot\vect n_{\Gamma_{h/m}^1})\,\vect H_{\Gamma} \big) : \big( E_{s,\,\Gamma_{h/m}^1}(\vect v) - (\vect v\cdot\vect n_{\Gamma_{h/m}^1})\,\vect H_{\Gamma} \big) \diff{s}
+%\end{equation*}
+%and
+%\begin{equation*}
+%	\int^5_{\Gamma_{h/m}^1} \big( E_{s,\,\Gamma}(\vect u) - (\vect u\cdot\vect n_{\Gamma})\,\vect H_{\Gamma} \big) : \big( E_{s,\,\Gamma}(\vect v) - (\vect v\cdot\vect n_{\Gamma})\,\vect H_{\Gamma} \big) \diff{s},
+%\end{equation*}
+%respectively. Convergence results for~\eqref{mtx_exact_2_cons} are presented in Tables~\ref{tab:p2p1_cons_h}\,--\,\ref{tab:p2p1_cons_h^-1}.
+%
+%We also consider the modified version of~\eqref{mtx_exact_2_cons}
+%\begin{equation}\label{mtx_exact_2_cons_upd}
+%\int^5_{\Gamma_{h/m}^{2 \to 1}} \big( E_{s,\,\Gamma_{h/m}^{2 \to 1}}(\vect u) - (\vect u\cdot\vect n_{\Gamma_h^2})\,\vect H_{\Gamma_h^2} \big) : \big( E_{s,\,\Gamma_{h/m}^{2 \to 1}}(\vect v) - (\vect v\cdot\vect n_{\Gamma_h^2})\,\vect H_{\Gamma_h^2} \big) \diff{s}.
+%\end{equation}
+%Convergence results for~\eqref{mtx_exact_2_cons_upd} are presented in Table~\ref{tab:p2p1_cons_upd_h^-1}.
+
+\begin{table}[h!]
+	\centering\footnotesize
+	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = \rho_p = h$. Matrices are assembled as in~\eqref{mtx_exact_2_cons}, i.e. both~$\vect n_{\Gamma^2_h}$ and $\vect n_{\Gamma^{2\to 1}_{h/m}}$ are used}
+	\label{tab:p2p1_cons_h}
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			\multicolumn{7}{|c|}{$m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} \\
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_m12_vstab=1.000000_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 2mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & $\| \vect P\,\vect u_h - \vect u \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_m12_vstab=1.000000_iters_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 4mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			\multicolumn{7}{|c|}{$m \in \vect m_1$ as in Figure~\ref{fig:m}} \\
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_m=1_vstab=1.000000_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 2mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & $\| \vect P\,\vect u_h - \vect u \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_m=1_vstab=1.000000_iters_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}
+
+\begin{table}[h!]
+	\centering\footnotesize
+	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = h$. Matrices are assembled as in~\eqref{mtx_exact_2_cons}}
+	\label{tab:p2p1_cons_h^-1}
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c||c|c|c|}
+			\hline
+			\multicolumn{10}{|c|}{$m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} \\
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order & $\|\vect n_\Gamma - \vect n_{\Gamma_{h}^2}\|_{\LTwo}$ & $\|\vect n_\Gamma - \vect n_{\Gamma_{h/m}^1} \|_{\LTwo}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_m=12_vstab=-1.000000_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 2mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & $\| \vect P\,\vect u_h - \vect u \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_m=12_vstab=-1.000000_iters_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 4mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			\multicolumn{7}{|c|}{$m \in \vect m_1$ as in Figure~\ref{fig:m}} \\
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=1_shift=0.0h_form=consistent_m=1_rhofac=1_rhopow=-1_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 2mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & $\| \vect P\,\vect u_h - \vect u \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=1_shift=0.0h_form=consistent_m=1_rhofac=1_rhopow=-1_iters_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}
+
+\begin{table}[h!]
+	\centering\footnotesize
+	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = h$. Matrices are assembled as in~\eqref{mtx_exact_2_cons_upd}}
+	\label{tab:p2p1_cons_upd_h^-1}
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			\multicolumn{7}{|c|}{$m \in \vect m_1$ as in Figure~\ref{fig:m}} \\
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=1_shift=0.0h_form=consistent_m=1_vstab=-1_upd_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+	\vskip 2mm	
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+			\hline
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & $\| \vect P\,\vect u_h - \vect u \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=1_shift=0.0h_form=consistent_m=1_vstab=-1_upd_iters_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}
+
+%\begin{table}[h!]
+%	\centering\footnotesize
+%	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = \rho_p = h$, $m$ as in Figure~\ref{fig:m} (Left). Matrices are assembled as in~\eqref{mtx_exact_2}}
+%	\label{tab:p2p1_conv_cons}
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c||c|c|c|}
+%			\hline
+%			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order & $\|\vect n_\Gamma - \vect n_{\Gamma_{h}^2}\|_{\LTwo}$ & $\|\vect n_\Gamma - \vect n_{\Gamma_{h/m}^1} \|_{\LTwo}$ & Order \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_oldref_conv_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%	\vskip 4mm	
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+%			\hline
+%			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & $\| \vect P\,\vect u_h - \vect u \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_oldref_iters_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%\end{table}
+
+%\begin{table}[h!]
+%	\centering\footnotesize
+%	\caption{Convergence results. Same as Table~\ref{tab:p2p1_conv_cons}, but with $m$ doubled, i.e. $\Gamma_{h/2m}^1$ is used instead of $\Gamma_{h/m}^1$}
+%	\label{tab:p2p1_conv_cons_ref}
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c||c|c|c|}
+%			\hline
+%			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order & $\|\vect n_\Gamma - \vect n_{\Gamma_{h}^2}\|_{\LTwo}$ & $\|\vect n_\Gamma - \vect n_{\Gamma_{h/m}^1} \|_{\LTwo}$ & Order \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_newref_conv_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%	\vskip 4mm	
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+%			\hline
+%			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & $\| \vect P\,\vect u_h - \vect u \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=exact_shift=0.0h_form=consistent_newref_iters_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%\end{table}
+
+%\begin{table}[h!]
+%	\centering\footnotesize
+%	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = \rho_p = h$, $m$ as in Figure~\ref{fig:m} (Left), Matrices are assembled as in~\eqref{mtx_exact}, i.e. $I^2_h(\phi)$ is used to define all the normal vectors}
+%	\label{tab:p2p1_conv_cons_p2}
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c||c|c|c|}
+%			\hline
+%			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order & $\|\vect n_\Gamma - \vect n_{\Gamma_{h}^2}\|_{\LTwo}$ & $\|\vect n_\Gamma - \vect n_{\Gamma_{h/m}^1} \|_{\LTwo}$ & Order \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=P2_shift=0.0h_form=consistent_oldref_conv_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%	\vskip 4mm	
+%	\begin{subtable}{1.\linewidth}\centering
+%		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+%			\hline
+%			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & $\| \vect P\,\vect u_h - \vect u \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+%			\hline
+%			\input{sphere_2_P2P1_normals=P2_shift=0.0h_form=consistent_oldref_iters_table.tex}
+%		\end{tabular}
+%	\end{subtable}
+%\end{table}
+
+\clearpage
 
 \section{Notes on DROPS implementation}
 
@@ -735,6 +1084,82 @@ const double edge_bary1_cut= ls0/(ls0 - ls1); // the root of the level set funct
 \end{lstlisting}
 Here~$l(x) := \texttt{ls0}\,(1-x) + \texttt{ls1}\,x$ is a linear function defined on the master edge~$[0, 1]$. Indeed, its root is~$x = \texttt{ls0/(ls0 - ls1)}$.
 
+\subsection{Approximation of the shape operator~\textbf{H}}\label{sec:shape}
+
+%With~$\vect P : \mathcal{O}(\Gamma) \rightarrow \mathbb R^3$ defined as~$\vect P \coloneqq \vect I - \vect n^e\,(\vect n^e)^T$, we have. 
+%\begin{equation*}
+%	\vect H \coloneqq \nabla_{\Gamma} \vect n \coloneqq \vect P\,\nabla \vect n^e\,\vect P = \vect P\,\nabla \vect n^e,
+%\end{equation*}
+%$\vect H_\Gamma : \mathcal{O}(\Gamma) \rightarrow \mathbb{R}^3$. Note that~$\vect n_\phi \coloneqq \nabla \phi / \|\nabla \phi\|$ is defined in~$\mathcal{O}(\Gamma)$, so~$\nabla \vect n_\phi$ makes sense and
+%\begin{equation*}
+%	\nabla \vect n_\phi = \Big(\vect I - \frac{\nabla \phi\,\nabla \phi^T}{\|\nabla \phi\|^2}\Big)\frac{\nabla^2 \phi}{\|\nabla \phi\|} = \big(\vect I - \vect n_\phi\,\vect n_\phi^T\big)\,\frac{\nabla^2 \phi}{\|\nabla \phi\|} = \vect P_\phi\,\frac{\nabla^2 \phi}{\|\nabla \phi\|}.
+%\end{equation*}
+%Note that~$\vect n_\phi = \vect n$ on~$\Gamma$ for any smooth levelset~$\phi$, so
+%\begin{equation*}
+%	\vect H = \vect P\,\nabla \vect n^e_\phi.
+%\end{equation*}
+%Depending on the choice of~$\phi$, we may or may not have~$\vect n_\phi = \vect n^e_\phi$ in~$\mathcal{O}(\Gamma)$. Note that the choice~$\phi = d$ is sufficient for this, but \textbf{not necessary}. Consider these choices of~$\phi$ for $\sphere$:
+%\begin{enumerate}
+%	\item $\phi_1(\vect x) = \|\vect x\| - 1 = d(\vect x)$, $\vect n_{\phi_1} = \vect n^e$ in~$\mathcal{O}(\Gamma)$,
+%	\item $\phi_2(\vect x) = \|\vect x\|^2 - 1 \in P^2$, $\vect n_{\phi_2} = \vect n_{\phi_1} = \vect n^e$ in~$\mathcal{O}(\Gamma)$,
+%	\item $\phi_3(\vect x) = e^{\phi_2(\vect x)}\,x^2 + y^2 + z^2 -1$, $\vect n_{\phi_3} = \vect n$ only on~$\sphere$, i.e.~$\vect n_{\phi_3} \ne \vect n^e$ in~$\mathcal{O}(\Gamma)$.
+%\end{enumerate}
+%
+%For a smooth function~$\vect f : \mathcal{O}(\Gamma) \rightarrow \mathbb R^3$, one has~$\nabla \vect f^e = \nabla (\vect f \circ \vect p) = \big(\nabla \vect p\big)^T\,\big(\nabla \vect f\big)^e$, so
+%\begin{equation*}
+%	\vect H = \vect P\,\nabla \vect n_\phi^e = \vect P\,\big(\nabla \vect p\big)^T\,\big(\nabla \vect n_\phi \big)^e = \vect P\,\big(\nabla \vect p\big)^T\,\Big(\vect P_\phi\,\frac{\nabla^2 \phi}{\|\nabla \phi\|} \Big)^e = \vect P\,\big(\nabla \vect p\big)^T\,\vect P\,\Big(\frac{\nabla^2 \phi}{\|\nabla \phi\|} \Big)^e.
+%\end{equation*}
+%
+%\begin{equation}\label{H}
+%\vect H_\Gamma = \vect P_{\Gamma}\,\frac{\nabla^2 \phi}{\|\nabla \phi\|}\,\vect P_{\Gamma}.
+%\end{equation}
+%Thus we define~$\vect H_{\Gamma^2_h}$ to be as in~\eqref{H} but with $\phi$ replaced with~$I^2_h(\phi)$. Indeed, computation of~$\vect H_{\Gamma^2_h}$ requires Hessians of shape functions, but luckily this routine was implemented in DROPS.
+%
+%Note that if~$\phi$ is piecewise quadratic in~$\Omega^\Gamma_h$, then~$\vect H_{\Gamma^2_h}$ is represented \textbf{exactly}. I actually checked it via computing~$\vect H_{\Gamma^2_h}$ at several points in DROPS and compared it with~$\vect H$ for~$\sphere$. 
+%
+%For the approach~\eqref{mtx_exact_2}, there is also an option to approximate~$\vect H$ as~$\vect P_{\Gamma_{h/m}^{2\to 1}}\,\frac{\nabla^2 I_h^2(\phi)}{\|\nabla I_h^2(\phi)\|}\,\vect P_{\Gamma_{h/m}^{2\to 1}}$ since we build~$\vect P_{\Gamma_{h/m}^{2\to 1}}$ anyway. I chose to use~$\vect H_{\Gamma_h^2} \coloneqq \vect P_{\Gamma_h^2}\,\frac{\nabla^2 I_h^2(\phi)}{\|\nabla I_h^2(\phi)\|}\,\vect P_{\Gamma_h^2}$ for both~\eqref{mtx_exact} and ~\eqref{mtx_exact_2}.
+
+We have~$\vect H_\Gamma \coloneqq \nabla_\Gamma \vect n_\Gamma \coloneqq \vect P_{\Gamma}\,\nabla \vect n^e_\Gamma\,\vect P_{\Gamma}$, $\vect H_\Gamma : \mathcal{O}(\Gamma) \rightarrow \mathbb{R}^3$. Note that~$\vect n_\Gamma = \nabla \phi / \|\nabla \phi\|$ is defined in~$\mathcal{O}(\Gamma)$, so~$\nabla \vect n_\Gamma$ makes sense and
+\begin{equation*}
+	\nabla \vect n_\Gamma = \Big(\vect I - \frac{\nabla \phi\,\nabla \phi^T}{\|\nabla \phi\|^2}\Big)\frac{\nabla^2 \phi}{\|\nabla \phi\|} = \vect P_{\Gamma}\,\frac{\nabla^2 \phi}{\|\nabla \phi\|}.
+\end{equation*}
+If~$\vect n_\Gamma = \vect n^e_\Gamma$, one gets
+\begin{equation}\label{H}
+	\vect H_\Gamma = \vect P_{\Gamma}\,\frac{\nabla^2 \phi}{\|\nabla \phi\|}\,\vect P_{\Gamma}.
+\end{equation}
+Thus we define~$\vect H_{\Gamma^2_h}$ to be as in~\eqref{H} but with $\phi$ replaced with~$I^2_h(\phi)$:
+\begin{equation}\label{Hh}
+	\vect H_{\Gamma_h^2} \coloneqq \vect P_{\Gamma_h^2}\,\frac{\nabla^2 I_h^2(\phi)}{\|\nabla I_h^2(\phi)\|}\,\vect P_{\Gamma_h^2}.
+\end{equation}
+Indeed, computation of~$\vect H_{\Gamma^2_h}$ requires Hessians of shape functions, but luckily this routine was implemented in DROPS.
+
+Depending on the choice of~$\phi$, we may or may not have~$\vect n_\Gamma = \vect n^e_\Gamma$. Note that the choice~$\phi = d$ is sufficient for this, but not necessary. Consider this choices of~$\phi$ for $\sphere$:
+\begin{enumerate}
+	\item $\phi_1(\vect x) = \|\vect x\| - 1 = d(\vect x)$, $\nabla \phi_1 / \|\nabla \phi_1\| = \vect n_\Gamma^e$,
+	\item $\phi_2(\vect x) = \|\vect x\|^2 - 1 \in P^2$, $\nabla \phi_2 / \|\nabla \phi_2\| = \nabla \phi_1 / \|\nabla \phi_1\| = \vect n_\Gamma^e$,
+	\item $\phi_3(\vect x) = e^{\phi_2(\vect x)}\,x^2 + y^2 + z^2 -1$, $\nabla \phi_3 / \|\nabla \phi_3\| \ne \vect n_\Gamma^e$, i.e. $\nabla \phi_3 / \|\nabla \phi_3\| = \vect n_\Gamma$ only on~$\sphere$.
+\end{enumerate}
+As for the case 2: note that if~$\phi$ is piecewise quadratic in~$\Omega^\Gamma_h$ and defines a normal that is equal to its extension, then~$\vect H_{\Gamma^2_h} = \vect H_{\Gamma}$, i.e. the approximation is \textbf{exact}.
+
+For the approach~\eqref{mtx_exact_2}, there is also an option to approximate~$\vect H$ as~$\vect P_{\Gamma_{h/m}^{2\to 1}}\,\frac{\nabla^2 I_h^2(\phi)}{\|\nabla I_h^2(\phi)\|}\,\vect P_{\Gamma_{h/m}^{2\to 1}}$ since we build~$\vect P_{\Gamma_{h/m}^{2\to 1}}$ anyway. I chose to use~\eqref{Hh} for both~\eqref{mtx_exact} and~\eqref{mtx_exact_2}.
+
+%We have~$\vect H_\Gamma \coloneqq \nabla \vect n_\Gamma$. Using~$\vect n_\Gamma = \nabla \phi / \|\nabla \phi\|$, one gets
+%\begin{equation}\label{H}
+%	\vect H_\Gamma = \Big(\vect I - \frac{\nabla \phi\,\nabla \phi^T}{\|\nabla \phi\|^2}\Big)\frac{\nabla^2 \phi}{\|\nabla \phi\|} = \vect P_{\Gamma}\,\frac{\nabla^2 \phi}{\|\nabla \phi\|}.
+%\end{equation}
+%Thus we define~$\vect H_{\Gamma^2_h}$ to be as in~\eqref{H} but with $\phi$ replaced with~$I^2_h(\phi)$. Indeed, computation of~$\vect H_{\Gamma^2_h}$ requires Hessians of shape functions, but luckily this routine was implemented in DROPS.
+%
+%Note that if~$\phi$ is piecewise quadratic on~$\Omega_\Gamma^h$, then~$\vect H_{\Gamma^2_h}$ is represented \textbf{exactly}. I actually checked it via computing~$\vect H_{\Gamma^2_h}$ at several points in DROPS and compared it to~$\vect H$ for~$\sphere$. 
+%
+%Comments:
+%
+%\begin{itemize}
+%	\item For the approach~\eqref{mtx_exact_2}, there is also an option to approximate~$\vect H$ as~$\vect P_{\Gamma_{h/m}^{2\to 1}}\,\frac{\nabla^2 I_h^2(\phi)}{\|\nabla I_h^2(\phi)\|}$ since we build~$\vect P_{\Gamma_{h/m}^{2\to 1}}$ anyway. I chose to use~$\vect H_{\Gamma_h^2} \coloneqq \vect P_{\Gamma_h^2}\,\frac{\nabla^2 I_h^2(\phi)}{\|\nabla I_h^2(\phi)\|}$ for both~\eqref{mtx_exact} and ~\eqref{mtx_exact_2}.
+%	\item From the identity~$E_{s,\,\Gamma}(\vect a) = E_{s,\,\Gamma}(\vect a_T) + a_N\,\vect H_{\Gamma}$ we have that $\vect H = E_{s,\,\Gamma}(\vect n_{\Gamma}) = \vect P_{\Gamma}\,\frac{\nabla^2 \phi}{\|\nabla \phi\|}\,\vect P_{\Gamma} = \nabla \vect n_\Gamma\,\vect P_{\Gamma}$. If $\vect n_\Gamma^e \equiv \vect n_\Gamma$, then we have~\eqref{H}.
+%	\item But it maybe the case that for~$\phi \ne d$, e.g.~$\phi(x, y, z) = 2 x^2 + y^2 +z^2 - 1$, we have that~$\vect n_{\Gamma} = \nabla \phi / \|\nabla \phi\| \ne \vect n^e_{\Gamma}$, and~$\nabla \vect n_{\Gamma}$ is not symmetric. Is not it better to take~$\vect H = \vect P_{\Gamma}\,\frac{\nabla^2 \phi}{\|\nabla \phi\|}\,\vect P_{\Gamma}$ to guarantee its symmetry? In the end of the day $\vect H = E_{s,\,\Gamma}(\vect n_{\Gamma}) = \vect H^T$.
+%	\item Is it true if $\Dist(\Gamma, \Gamma_h) \lesssim h^3$, then $\| \vect n - \vect n_h \|_{\LTwo} \lesssim h^2$? I do not really see $h^2$ convergence of the normal in Table~\ref{tab:p2p1_conv_cons_mright}... I figured out that computing~$\Dist(\sphere, \sphere_{h/m}^1)$ is easy since one just need to take maximum of distance function $\|\vect x\| - 1$ over all vertices of the patch. I may add it real quick to see if~$\Dist(\sphere, \sphere_{h/m}^1) \lesssim h^3$ for $m = O(h^{-1/2})$.
+%\end{itemize}
+ 
 \subsection{Summary on the matrix assembly}
 
 The matrices in~\eqref{mtx} are assembled as
@@ -805,23 +1230,23 @@ Here 2 corresponds to $m = 2$, and ``yes'' corresponds to~\eqref{mtx_exact_2}.
 	\centering
 	\begin{subfigure}{.5\linewidth}
 		\centering
-		\includegraphicsw[.6]{patches_2.png}
+		\includegraphicsw[.55]{patches_2.png}
 	\end{subfigure}%
 	\begin{subfigure}{.5\linewidth}
 		\centering
-		\includegraphicsw[.6]{normals_2.png}
+		\includegraphicsw[.55]{normals_2.png}
 	\end{subfigure}%
 	\par\bigskip
 	\begin{subfigure}{.5\linewidth}
 		\centering
-		\includegraphicsw[.6]{patches_4.png}
+		\includegraphicsw[.55]{patches_4.png}
 	\end{subfigure}%
 	\begin{subfigure}{.5\linewidth}
 		\centering
-		\includegraphicsw[.6]{normals_4.png}
+		\includegraphicsw[.55]{normals_4.png}
 	\end{subfigure}%
 	\par\bigskip
-	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^2 - 1$, $h = 8.33\times10^{-1}$. Top-left: $\Gamma_{h/2}^{2 \rightarrow 1} = \Gamma_{h/2}^1$ (different color corresponds to a different \texttt{spatch} $\gamma \in \Gamma_{h/2}^{2 \rightarrow 1}$ as described in section~\ref{subsec:integrals}). Top-right: a patch~$\gamma \in \Gamma_{h/2}^{2 \rightarrow 1}$ and its normals. Bottom-left and bottom-right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} = \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \in P^2$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} = \Gamma_{h/m}^1 \rightarrow \Gamma$ as $m \rightarrow \infty$ independent of~$h$}}
+	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^2 - 1$, $h = 8.33\times10^{-1}$. Top-left: $\Gamma_{h/2}^{2 \rightarrow 1} = \Gamma_{h/2}^1$ (different color corresponds to a different \texttt{spatch} $\gamma \in \Gamma_{h/2}^{2 \rightarrow 1}$ as described in section~\ref{subsec:integrals}). Top-right: a patch~$\gamma \in \Gamma_{h/2}^{2 \rightarrow 1}$ and its normals. Bottom-left and bottom-right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} = \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \in P^2$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} = \Gamma_{h/m}^1 \rightarrow \Gamma$ as $m \rightarrow \infty$ for fixed~$h$}}
 	\label{fig:phi_exact}		
 \end{figure}
 \vfill
@@ -829,11 +1254,11 @@ Here 2 corresponds to $m = 2$, and ``yes'' corresponds to~\eqref{mtx_exact_2}.
 	\centering
 	\begin{subfigure}{.5\linewidth}
 		\centering
-		\includegraphicsw[.6]{patches_2_inexact.png}
+		\includegraphicsw[.55]{patches_2_inexact.png}
 	\end{subfigure}%
 	\begin{subfigure}{.5\linewidth}
 		\centering
-		\includegraphicsw[.6]{patches_4_inexact.png}
+		\includegraphicsw[.55]{patches_4_inexact.png}
 	\end{subfigure}%
 	\par\bigskip
 	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^{1/2} - 1$, $h = 8.33\times10^{-1}$. Left: $\Gamma_{h/2}^{2 \rightarrow 1} = \Gamma_{h/2}^1$ (different color corresponds to a different \texttt{spatch} $\gamma \in \Gamma_{h/2}^{2 \rightarrow 1}$ as described in section~\ref{subsec:integrals}). Right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} \ne \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \not\in \bar{P}^2_h$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} \ne \Gamma_{h/m}^1$ for~$m > 2$, and $\Gamma_{h/m}^{2 \rightarrow 1} \rightarrow \Gamma_h^2 \ne \Gamma$ as $m \rightarrow \infty$ for fixed~$h$}}
@@ -843,13 +1268,13 @@ Here 2 corresponds to $m = 2$, and ``yes'' corresponds to~\eqref{mtx_exact_2}.
 
 \subsection{Quadrature rules for the error computation}\label{subsec:err}
 
-When we first tried to test convergence for~\eqref{mtx_exact_2} in section~\ref{sec:conv}, we noticed that the~$\HOneSpace$-error of the velocity decays much slower than expected, whereas its~$\LTwoSpace$-error behaves as expected. Note that~$\HOneSpace$-error (for e.g. $\vect P_2$\,--\,$P_1$ FE) can be computed as~$\langle \vect w, \vect A_s\,\vect w \rangle^{1/2}$, $\vect w \coloneqq$ vector of d.o.f. corresponding to $\vect P^2_h$ interpolant $I_h^2(\vect u) - \vect u_h$, $\vect A_s \coloneqq$ matrix corresponding to the first term of~$\vect A$ in~\eqref{mtx_exact_2}. Thus the errors are approximated as
-\begin{align*}
-	\| \vect u - \vect u_h \|_{\HOneSpace} &= \| I^k_h(\vect u) - \vect u_h \|_{\HOneSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^{k}), \\
-	\| \vect u - \vect u_h \|_{\LTwoSpace} &= \| I^k_h(\vect u) - \vect u_h \|_{\LTwoSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^{k+1}), \\
-	\| p - p_h \|_{\LTwoSpace} &= \| I^1_h(p) - p_h \|_{\LTwoSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^2)
-\end{align*}
-for large enough~$m$. Here $k = 1$ for~$\vect P_1$\,--\,$P_1$ FEM and $k = 2$ for~$\vect P_2$\,--\,$P_1$.
+When we first tried to test convergence for~\eqref{mtx_exact_2} in section~\ref{sec:conv}, we noticed that the~$\HOneSpace$-error of the velocity decays much slower than expected, whereas its~$\LTwoSpace$-error behaves as expected. Note that~$\HOneSpace$-error (for e.g. $\vect P_2$\,--\,$P_1$ FE) can be computed as~$\langle \vect w, \vect A_s\,\vect w \rangle^{1/2}$, $\vect w \coloneqq$ vector of d.o.f. corresponding to $\vect P^2_h$ interpolant $I_h^2(\vect u^e) - \vect u_h$, $\vect A_s \coloneqq$ matrix corresponding to the first term of~$\vect A$ in~\eqref{mtx_exact_2}. Thus the errors are approximated as
+\begin{align}\begin{split}
+	\| \vect u - \vect u_h \|_{\HOneSpace} &= \| I^k_h(\vect u^e) - \vect u_h \|_{\HOneSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^{k}), \\
+	\| \vect u - \vect u_h \|_{\LTwoSpace} &= \| I^k_h(\vect u^e) - \vect u_h \|_{\LTwoSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^{k+1}), \\
+	\| p - p_h \|_{\LTwoSpace} &= \| I^1_h(p^e) - p_h \|_{\LTwoSpace[\Gamma_{h/m}^{2 \to 1}]} + O(h^2)
+\end{split}\end{align}
+for~$m > 1$. Here $k = 1$ for~$\vect P_1$\,--\,$P_1$ FEM and $k = 2$ for~$\vect P_2$\,--\,$P_1$. For consistent penalty approach matrix~$\vect A_s$ is computed as in~\eqref{mtx_exact_2_cons}.
 
 \textbf{Interestingly enough}, DROPS implementation did not use the assembled matrices to compute errors (and normals that are \textit{different} from the ones in~$\vect A_s$ were used). We corrected it in commit~\texttt{\href{https://github.com/56th/drops/commit/68443b0a678447ba8b3e7e0af1621e6cd402e5d1}{68443b0}}:
 \begin{lstlisting}
