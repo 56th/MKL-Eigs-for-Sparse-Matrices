@@ -351,5 +351,3 @@ MKL_Eigs_for_Sparse_Matrices
 
 stdin.txt
 output/tg.txt
-
-*.mtx

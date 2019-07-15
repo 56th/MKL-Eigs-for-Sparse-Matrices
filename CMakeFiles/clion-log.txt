@@ -1,0 +1,9 @@
+/snap/clion/73/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - Unix Makefiles" /home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices
+CMake Warning at CMakeLists.txt:6 (message):
+  mkl root is:
+  /home/alexander/intel/compilers_and_libraries_2019.1.144/linux/mkl
+
+
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices

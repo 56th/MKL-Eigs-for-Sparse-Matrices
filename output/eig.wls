@@ -1,20 +1,19 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
-(* https://reference.wolfram.com/language/workflow/CreateWolframLanguageScripts.html *)
-(* https://mathematica.stackexchange.com/a/175546/49280 *)
-(* also may run w/: #!/usr/local/bin/wolfram -script *)
-If[Length@$ScriptCommandLine < 3, Print["Error: please specify 2 matrices"]; Quit[]];
-{aName, mName} = $ScriptCommandLine[[{2, 3}]];
-oName = aName <> ".lambda.txt";
-Print["input:  ", aName, "\n        ", mName];
-Print["output: ", oName];
+If[Length@$ScriptCommandLine < 5, Print["Error: please specify surface, formulation, meshlevel, and shift"]; Quit[]];
+surface = $ScriptCommandLine[[2]];
+form = $ScriptCommandLine[[3]];
+meshLevel = ToExpression@$ScriptCommandLine[[4]];
+shift = $ScriptCommandLine[[5]];
 
 
-(* SetDirectory@NotebookDirectory[]
-h = ToString@First@Import["h.txt", "List"];
-aName = "P1P1/h="<>h<>"_A_block_0.mtx";
-mName = "P1P1/h="<>h<>"_eps=0.0001_M_block_0.mtx"; *)
+h = {0.833332,0.416666,0.208333,0.104167,0.052083,0.026042,0.013021};
+hStr=If[StringLength@#<8,#<>StringJoin@Table["0",{8-StringLength@#}],#]&/@ToString/@h;
+Print["h = ", hStr[[meshLevel]]];
+inDir = "../../drops/output/NavierStokes_"<>surface<>"/test85_h="<>hStr[[meshLevel]]<>"/shift="<>shift<>"_form="<>form<>"_";
+Print["input:  ", inDir, "*"];
+Print[""];
 
 
 Get["https://raw.githubusercontent.com/dih5/TgBot/master/TgBot/TgBot.m"];
@@ -27,34 +26,59 @@ tg[text_, time_]:=BotAPICall["sendMessage", {"chat_id"->tgChatID, "text" ->
 {"Token"->tgToken}];
 
 
+eps = 10.^-6;
 time = First@AbsoluteTiming[
-	A = Import[aName];
-	M = Import[mName]; 
-	n = Length@A;
+	A = Import[inDir<>"A.mat"][[1]];
+	B = Import[inDir<>"B.mat"][[1]];
+	M0 = Import[inDir<>"M.mat"][[1]];
+	nA = Length@A;
+	nS = Length@M0;
+	Cfull = Import[inDir<>"C_full.mat"][[1]];
+	Cn = Import[inDir<>"C_n.mat"][[1]];
+	Print["size of A      = ", Length@A];
+	Print["size of M      = ", Length@M0];
+	Print["size of C_n    = ", Length@Cn];
+	Print["size of C_full = ", Length@Cfull];
+	Print["max memory used:  ", ToString@TeXForm@ScientificForm[MaxMemoryUsed[] * 10.^-6, 3], " MB"];
+	Print["memory available: ", ToString@TeXForm@ScientificForm[MemoryAvailable[] * 10.^-6, 3], " MB"];
+	Print[""];
 ];
-tg["import matrices (" <> aName <> "), n = " <> ToString@n, time];
+tg["import matrices (" <> inDir <> "*), n_A = " <> ToString@nA <> ", n_S = " <> ToString@nS, time];
 
 
 findMinArn[A_, M_] := Module[{l, x},
-	{l, x} = First@Transpose@Eigensystem[{A, M}, -2, Method->{"Arnoldi"}];
+	{l, x} = First@Transpose@Quiet@Eigensystem[{A, M}, -2, Method->{"Arnoldi"}];
 	{-l, Norm[A.x - l(M.x)]}
 ]
 findMaxArn[A_, M_] := Module[{l, x},
-	{l, x} = First@Transpose@Eigensystem[{A, M}, 1, Method->{"Arnoldi", "Shift"-> -5}];
+	{l, x} = First@Transpose@Quiet@Eigensystem[{A, M}, 1, Method->{"Arnoldi", "Shift"-> -5}];
 	{-l, Norm[A.x - l(M.x)]}
 ]
 
 
-time = First@AbsoluteTiming[
-	{lMin, lMinRes} = findMinArn[A, M]; 
-];
-tg["lambda_min = " <> ToString@TeXForm@ScientificForm[lMin, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMinRes, 3], time];
-
-
-time = First@AbsoluteTiming[
-	{lMax, lMaxRes} = findMaxArn[A, M]; 
-];
-tg["lambda_max = " <> ToString@TeXForm@ScientificForm[lMax, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMaxRes, 3], time];
-
-
-Export[oName, <| "n" -> n, "lambdas" -> {lMin, lMax}, "residuals" -> {lMinRes, lMaxRes} |>];
+Do[
+	a = b = {};
+	If[stab == "0",
+		a = ArrayFlatten[{{A, Transpose@B}, {B, 0.}}];
+		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0}}];
+	];
+	If[stab == "n",
+		a = ArrayFlatten[{{A, Transpose@B}, {B, -Cn}}];
+		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cn}}];
+		Clear[Cn];
+	];
+	If[stab == "full",
+		a = ArrayFlatten[{{A, Transpose@B}, {B, -Cfull}}];
+		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cfull}}];
+		Clear[Cfull];
+	];
+	time = First@AbsoluteTiming[
+		{lMin, lMinRes} = findMinArn[a, b]; 
+	];
+	tg[stab <> "-stab:\nlambda_min = " <> ToString@TeXForm@ScientificForm[lMin, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMinRes, 3], time];
+	time = First@AbsoluteTiming[
+		{lMax, lMaxRes} = findMaxArn[a, b]; 
+	];
+	tg[stab <> "-stab:\nlambda_max = " <> ToString@TeXForm@ScientificForm[lMax, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMaxRes, 3], time];
+	Export[inDir <> "stab=" <> stab <> "_lambda.json", <| "n_A" -> nA, "n_S" -> nS, "lambdas" -> {lMin, lMax}, "residuals" -> {lMinRes, lMaxRes} |>], 
+{stab, {"0", "n", "full"}}]
