@@ -81,7 +81,7 @@ Do[
 	time = First@AbsoluteTiming[
 		{lMin, lMinRes} = findMinArn[a, b]; 
 	];
-	tg[stab <> "-stab:\nlambda_min = " <> ToString@TeXForm@ScientificForm[lMin, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMinRes, 3], time];
+	tg[s <> "-stab:\nlambda_min = " <> ToString@TeXForm@ScientificForm[lMin, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMinRes, 3], time];
 	time = First@AbsoluteTiming[
 		{lMax, lMaxRes} = findMaxArn[a, b]; 
 	];
