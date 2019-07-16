@@ -1089,15 +1089,17 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 
 \subsection{Dependency of the spectrum on the mesh size}
 
-\begin{table}[h]
-	\centering\small
+Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,$P_1$, and consistent $\vect P_2$\,--\,$P_1$ approaches.
+
+\begin{table}[H]
+	\centering\footnotesize
 	\caption{Spectrum of~\eqref{problem} for inconsistent $\vect P_1$\,--\,$P_1$, $\tau = h^{-2}$, $\rho_u = h$, $\rho_p = h$, $m \equiv 2$} 
 	\label{tab:p1p1}
 	\begin{subtable}{1.\linewidth}
 		\centering
 		\caption{$\Gamma = \sphere$}
 		\label{tab:p1p1:sph}
-		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|c|c|}
 			\hline
 			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 			\cline{4-9}
@@ -1131,8 +1133,7 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 		\end{tabular}
 	\end{subtable}
 \end{table}
-\vfill
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering\small
 	\begin{subfigure}{.49\linewidth}
 		\centering
@@ -1147,18 +1148,16 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 	\end{subfigure}
 	\caption{Log-log plot of~$\lambda_2$ for Tables~\ref{tab:p1p1}\subref{tab:p1p1:sph} (left) and~\ref{tab:p1p1}\subref{tab:p1p1:tor} (right)}
 \end{figure}
-\vfill
-\clearpage
-\vfill
-\begin{table}[h]
-	\centering\small
-	\caption{Spectrum of~\eqref{problem} for $\vect P_2$\,--\,$P_1$, $\Gamma = \sphere$, $m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} 
+
+\begin{table}[H]
+	\centering\footnotesize
+	\caption{Spectrum of~\eqref{problem} for consistent $\vect P_2$\,--\,$P_1$, $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = h$, $m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} 
 	\label{tab:p2p1}
 	\begin{subtable}{1.\linewidth}
 		\centering
-		\caption{Consistent approach, $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = h$}
+		\caption{$\Gamma = \sphere$}
 		\label{tab:p2p1:sph}
-		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|c|c|}
 			\hline
 			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 			\cline{4-9}
@@ -1182,8 +1181,7 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 %		\end{tabular}
 %	\end{subtable}
 \end{table}
-\vfill
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering\small
 	\begin{subfigure}{.49\linewidth}
 		\centering
@@ -1196,10 +1194,62 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 %	\end{subfigure}
 	\caption{Log-log plot of~$\lambda_2$ for Table~\ref{tab:p2p1}\subref{tab:p2p1:sph}}
 \end{figure}
-\vfill
+
 \subsection{Sensitivity of the spectrum to levelset shifts}
-TBA
-\clearpage
+
+In this section we investigate the sensitivity of the spectrum to levelset shifts
+\begin{equation}\label{shift}
+\Gamma \mapsto \Gamma + \alpha\,\vect s
+\end{equation}
+for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$. We refer to Figure~\ref{fig:shift}.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.6]{{shift_0.0.cropped}.png}
+		\caption{$\sphere$}
+	\end{subfigure}%
+	\begin{subfigure}{.5\linewidth}
+		\centering
+		\includegraphicsw[.6]{{shift_0.4.cropped}.png}
+		\caption{$\sphere + \alpha\,\vect s$}
+	\end{subfigure}%
+	\caption{$\|\vect u_h\|$ on the unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (1, 1, 1)^T/\sqrt{3}$, $\alpha = 0.4$, and $h = 1.04\times10^{-1}$}
+	\label{fig:shift}		
+\end{figure}
+
+\begin{table}[H]
+	\centering
+	\caption{Spectrum of~\eqref{problem} for perturbed levelset $\Gamma + \alpha\,\vect s$ for consistent $\vect P_2$\,--\,$P_1$, $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = h$, $m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}. Here $\vect s = (1, 1, 1)^T/\sqrt{3}$, $h = 1.04\times10^{-1}$} 
+	\label{tab:p1p1_shift_h=0.104167}
+	\footnotesize
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|}
+			\hline
+			\multirow{2}{*}{Surface} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{2-7}
+			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{sphere_2_P2P1_consistent_h=0.104167_table.tex}
+		\end{tabular}
+	\end{subtable}
+%	\vskip 4mm
+%	\begin{subtable}{1.\linewidth}
+%		\centering
+%		\caption{$\vect P_2$\,--\,$P_1$}
+%		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|}
+%			\hline
+%			\multirow{2}{*}{Surface} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+%			\cline{2-7}
+%			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+%			\hline
+%			\input{sphere_2_P2P1_h=0.104167_table.tex}
+%		\end{tabular}%
+%	\end{subtable}
+\end{table}
+
 %\clearpage
 %\vfill
 %\begin{table}[h]
