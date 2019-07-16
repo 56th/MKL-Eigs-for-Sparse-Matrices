@@ -1,12 +1,12 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
-If[Length@$ScriptCommandLine < 6, Print["Error: please specify surface, formulation, meshlevel, shift, and stab"]; Quit[]];
+If[Length@$ScriptCommandLine < 5, Print["Error: please specify surface, formulation, meshlevel, shift, and [stab]"]; Quit[]];
 surface = $ScriptCommandLine[[2]];
 form = $ScriptCommandLine[[3]];
 meshLevel = ToExpression@$ScriptCommandLine[[4]];
 shift = $ScriptCommandLine[[5]];
-stab = $ScriptCommandLine[[6]];
+If[Length@$ScriptCommandLine == 6, stab = {$ScriptCommandLine[[6]]}, stab = {"0", "n", "full"}];
 
 
 h = {0.833332,0.416666,0.208333,0.104167,0.052083,0.026042,0.013021};
@@ -40,21 +40,7 @@ time = First@AbsoluteTiming[
 	Print["size of M      = ", Length@M0];
 	Print["size of C_n    = ", Length@Cn];
 	Print["size of C_full = ", Length@Cfull];
-	a = b = {};
-	If[stab == "0",
-		a = ArrayFlatten[{{A, Transpose@B}, {B, 0.}}];
-		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0}}];
-	];
-	If[stab == "n",
-		a = ArrayFlatten[{{A, Transpose@B}, {B, -Cn}}];
-		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cn}}];
-		Clear[Cn];
-	];
-	If[stab == "full",
-		a = ArrayFlatten[{{A, Transpose@B}, {B, -Cfull}}];
-		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cfull}}];
-	];
-	Clear[A, B, M0, Cfull, Cn];
+	Print["types: ", Head/@{A, B, M0, Cfull, Cn}];
 	Print["max memory used:  ", ToString@TeXForm@ScientificForm[MaxMemoryUsed[] * 10.^-6, 3], " MB"];
 	Print["memory available: ", ToString@TeXForm@ScientificForm[MemoryAvailable[] * 10.^-6, 3], " MB"];
 	Print[""];
@@ -72,12 +58,29 @@ findMaxArn[A_, M_] := Module[{l, x},
 ]
 
 
-time = First@AbsoluteTiming[
-	{lMin, lMinRes} = findMinArn[a, b]; 
-];
-tg[stab <> "-stab:\nlambda_min = " <> ToString@TeXForm@ScientificForm[lMin, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMinRes, 3], time];
-time = First@AbsoluteTiming[
-	{lMax, lMaxRes} = findMaxArn[a, b]; 
-];
-tg[stab <> "-stab:\nlambda_max = " <> ToString@TeXForm@ScientificForm[lMax, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMaxRes, 3], time];
-Print[Export[inDir <> "stab=" <> stab <> "_lambda.json", <| "n_A" -> nA, "n_S" -> nS, "lambdas" -> {lMin, lMax}, "residuals" -> {lMinRes, lMaxRes} |>]];
+Do[
+	If[s == "0",
+		a = SparseArray@ArrayFlatten[{{A, Transpose@B}, {B, 0.}}];
+		b = SparseArray@ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0}}];
+	];
+	If[s == "n",
+		a = SparseArray@ArrayFlatten[{{A, Transpose@B}, {B, -Cn}}];
+		b = SparseArray@ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cn}}];
+		Clear[Cn];
+	];
+	If[s == "full",
+		a = SparseArray@ArrayFlatten[{{A, Transpose@B}, {B, -Cfull}}];
+		b = SparseArray@ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cfull}}];
+		Clear[Cfull];
+	];
+	Print["types of block matrices: ", Head/@{a, b}];
+	time = First@AbsoluteTiming[
+		{lMin, lMinRes} = findMinArn[a, b]; 
+	];
+	tg[stab <> "-stab:\nlambda_min = " <> ToString@TeXForm@ScientificForm[lMin, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMinRes, 3], time];
+	time = First@AbsoluteTiming[
+		{lMax, lMaxRes} = findMaxArn[a, b]; 
+	];
+	tg[s <> "-stab:\nlambda_max = " <> ToString@TeXForm@ScientificForm[lMax, 3] <> ", residual = " <> ToString@TeXForm@ScientificForm[lMaxRes, 3], time];
+	Print[Export[inDir <> "stab=" <> s <> "_lambda.json", <| "n_A" -> nA, "n_S" -> nS, "lambdas" -> {lMin, lMax}, "residuals" -> {lMinRes, lMaxRes} |>]],
+{s, stab}]
