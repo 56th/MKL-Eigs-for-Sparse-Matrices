@@ -1,12 +1,13 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
-If[Length@$ScriptCommandLine < 5, Print["Error: please specify surface, formulation, meshlevel, shift, and [stab]"]; Quit[]];
+If[Length@$ScriptCommandLine < 7, Print["Error: please specify surface, formulation, meshlevel, shift, [all|0|n|full], [mat|mtx]"]; Quit[]];
 surface = $ScriptCommandLine[[2]];
 form = $ScriptCommandLine[[3]];
 meshLevel = ToExpression@$ScriptCommandLine[[4]];
 shift = $ScriptCommandLine[[5]];
-If[Length@$ScriptCommandLine == 6, stab = {$ScriptCommandLine[[6]]}, stab = {"0", "n", "full"}];
+If[$ScriptCommandLine[[6]] != "all", stab = {$ScriptCommandLine[[6]]}, stab = {"0", "n", "full"}];
+fmt = $ScriptCommandLine[[7]];
 
 
 h = {0.833332,0.416666,0.208333,0.104167,0.052083,0.026042,0.013021};
@@ -27,15 +28,18 @@ tg[text_, time_]:=BotAPICall["sendMessage", {"chat_id"->tgChatID, "text" ->
 {"Token"->tgToken}];
 
 
+import[path_] := If[fmt == "mat", N@Import[path <> ".mat", "LabeledData"][[1, 2]], N@Import[path <> ".mtx", "MTX"]]
+
+
 eps = 10.^-6;
 time = First@AbsoluteTiming[
-	A = Import[inDir<>"A.mat", "LabeledData"][[1, 2]];
-	B = Import[inDir<>"B.mat", "LabeledData"][[1, 2]];
-	M0 = Import[inDir<>"M.mat", "LabeledData"][[1, 2]];
+	A = import[inDir<>"A"];
+	B = import[inDir<>"B"];
+	M0 = import[inDir<>"M"];
 	nA = Length@A;
 	nS = Length@M0;
-	Cfull = Import[inDir<>"C_full.mat", "LabeledData"][[1, 2]];
-	Cn = Import[inDir<>"C_n.mat", "LabeledData"][[1, 2]];
+	Cfull = import[inDir<>"C_full"];
+	Cn = import[inDir<>"C_n"];
 	Print["size of A      = ", Length@A];
 	Print["size of M      = ", Length@M0];
 	Print["size of C_n    = ", Length@Cn];
@@ -60,17 +64,17 @@ findMaxArn[A_, M_] := Module[{l, x},
 
 Do[
 	If[s == "0",
-		a = SparseArray@ArrayFlatten[{{A, Transpose@B}, {B, 0.}}];
-		b = SparseArray@ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0}}];
+		a = ArrayFlatten[{{A, Transpose@B}, {B, 0.}}];
+		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0}}];
 	];
 	If[s == "n",
-		a = SparseArray@ArrayFlatten[{{A, Transpose@B}, {B, -Cn}}];
-		b = SparseArray@ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cn}}];
+		a = ArrayFlatten[{{A, Transpose@B}, {B, -Cn}}];
+		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cn}}];
 		Clear[Cn];
 	];
 	If[s == "full",
-		a = SparseArray@ArrayFlatten[{{A, Transpose@B}, {B, -Cfull}}];
-		b = SparseArray@ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cfull}}];
+		a = ArrayFlatten[{{A, Transpose@B}, {B, -Cfull}}];
+		b = ArrayFlatten[{{SparseArray[{{i_,i_} -> eps}, {nA, nA}], 0.}, {0., M0 + Cfull}}];
 		Clear[Cfull];
 	];
 	Print["types of block matrices: ", Head/@{a, b}];
