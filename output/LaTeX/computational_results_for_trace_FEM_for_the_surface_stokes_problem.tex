@@ -10,6 +10,19 @@
 \colorlet{DarkGreen}{Green!50!black}
 \colorlet{LightGreen}{Green!10!white}
 \usepackage{colortbl} % https://texblog.org/2011/04/19/highlight-table-rowscolumns-with-color/
+
+% sections
+\usepackage{titlesec} % https://latex.org/forum/viewtopic.php?t=10456
+\titleformat*{\section}{\large\bfseries}
+\titlespacing*{\section}{0pt}{2mm}{2mm}
+\titleformat{\subsection}[runin]% runin puts it in the same paragraph
+{\normalfont\bfseries}% formatting commands to apply to the whole heading
+{\thesubsection}% the label and number
+{0.5em}% space between label/number and subsection title
+{}% formatting commands applied just to subsection title
+[.]% punctuation or other commands following subsection title
+\titleformat{\subsubsection}[runin]{\normalfont\bfseries}{\thesubsubsection}{0.5em}{}[.]
+
 % links
 \usepackage{hyperref}
 \hypersetup{
@@ -94,18 +107,19 @@
 We set $n_{\vect A}$ to be the number of velocity d.o.f. and $n_{\vect S}$ to be the number of pressure d.o.f. Vector stiffness, divergence, pressure mass, normal stabilization, and full stabilization matrices resulting from Trace\,FEM discretization of the surface Stokes problem~\cite{surfstokes} are defined via
 \begin{align}\begin{split}\label{mtx}
 	\langle \vect A\,\vec{\vect u}, \vec{\vect v} \rangle &\approx 
-		\int_{\Gamma} \big( 2\,E_s(\vect u) : E_s(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n)\,(\vect v\cdot\vect n) \big) \diff{s} + 
-		\rho_u \int_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n}\cdot\frac{\partial \vect v}{\partial\vect n} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
+		\int_{\Gamma} \big( 2\,E_{s,\,\Gamma}(\vect u) : E_{s,\,\Gamma}(\vect v) + \vect u\cdot\vect v + \tau\,(\vect u\cdot\vect n_\Gamma)\,(\vect v\cdot\vect n_\Gamma) \big) \diff{s} \\
+	&+ 
+		\rho_u \int_{\Omega_h^{\Gamma}} \frac{\partial \vect u}{\partial\vect n_\Gamma}\cdot\frac{\partial \vect v}{\partial\vect n_\Gamma} \diff{\vect x}, \quad \vect A \in \mathbb R^{n_{\vect A} \times n_{\vect A}},\\
 	\langle \vect B\,\vec{\vect u}, \vec{\vect q} \rangle &\approx 
 		\int_{\Gamma} \nabla_\Gamma q \cdot \vect u \diff{s}, \quad \vect B \in \mathbb R^{n_{\vect S} \times n_{\vect A}},\\
 	\langle \vect M_0\,\vec{\vect p}, \vec{\vect q} \rangle &\approx
 		\int_{\Gamma} p\,q \diff{s}, \quad \vect M_0 \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
 	\langle \vect C_n\,\vec{\vect p}, \vec{\vect q} \rangle &\approx
-		\rho_p \int_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\vect n} \frac{\partial q}{\partial\vect n} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
+		\rho_p \int_{\Omega^{\Gamma}_h} \frac{\partial p}{\partial\vect n_\Gamma} \frac{\partial q}{\partial\vect n_\Gamma} \diff{\vect x}, \quad \vect C_n \in \mathbb R^{n_{\vect S} \times n_{\vect S}},\\
 	\langle \vect C_{\text{full}}\,\vec{\vect p}, \vec{\vect q} \rangle &\approx
 		\rho_p \int_{\Omega^{\Gamma}_h} \nabla p \cdot \nabla q \diff{\vect x}, \quad \vect C_{\text{full}} \in \mathbb R^{n_{\vect S} \times n_{\vect S}},		 
 \end{split}\end{align}
-respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega_\Gamma^h$ is the domain consisting of tetrahedra cut by the surface~$\Gamma \coloneqq \{ \vect x \in \mathbb{R}^3\::\:\phi(\vect x) = 0\}$. Here~$\vec{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\vec{\vect p}$ and $p$). See~\eqref{mtx_exact} and~\eqref{mtx_exact_2} for the computational details. Mesh-dependent parameters are set as $\tau$, $\rho_u$, and $\rho_p$ are chosen to be proportional to some power of~$h \coloneqq$~the typical mesh size for tetrahedra from~$\Omega^{\Gamma}_h$. $\Gamma$ is chosen either as the unit sphere or torus, $\Gamma = \sphere$ or $\Gamma = \tor$ (see Figure~\ref{fig:gamma}). The background domain is chosen as~$\Omega \coloneqq (-5/3,\,5/3)^3$.
+respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega^\Gamma_h$ is the domain consisting of tetrahedra cut by the surface~$\Gamma \coloneqq \{ \vect x \in \mathbb{R}^3\::\:\phi(\vect x) = 0\}$. Here~$\vec{\vect u}$ denotes a vector of d.o.f. corresponding to a FE interpolant~$\vect u$ (analogously for $\vec{\vect p}$ and $p$). See~\eqref{mtx_exact} and~\eqref{mtx_exact_2} for the computational details. Mesh-dependent parameters $\tau$, $\rho_u$, and $\rho_p$ are chosen to be proportional to some power of~$h \coloneqq$~the typical mesh size for tetrahedra from~$\Omega^{\Gamma}_h$. $\Gamma$ is chosen either as the unit sphere or torus, $\Gamma = \sphere$ or $\Gamma = \tor$ (see Figure~\ref{fig:gamma}). The background domain is chosen as a cube~$\Omega \coloneqq (-5/3,\,5/3)^3$.
 
 \begin{figure}[H]
 	\centering
@@ -216,10 +230,17 @@ The second option is
 		\includegraphicsw[.45]{normals_4.png}
 	\end{subfigure}%
 	\par\bigskip
-	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^2 - 1$, $h = 8.33\times10^{-1}$. Top-left: triangular patches~$\gamma \subset \Gamma_{h/2}^{2 \rightarrow 1} = \Gamma_{h/2}^1$ (different color corresponds to a different tetrahedron $T \in \Omega^\Gamma_h$). Top-right: a patch~$\gamma$ and its normals. Bottom-left and bottom-right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} = \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \in P^2$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} = \Gamma_{h/m}^1 \rightarrow \Gamma$ as $m \rightarrow \infty$ even for fixed~$h$}}
+	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^2 - 1$, $h = 8.33\times10^{-1}$. Top-left: triangular patches~$\gamma \in \Gamma_{h/2}^{2 \rightarrow 1} = \Gamma_{h/2}^1$ (different color corresponds to a different tetrahedron $T \in \Omega^\Gamma_h$). Top-right: a patch~$\gamma$ and its normals. Bottom-left and bottom-right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} = \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \in P^2$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} = \Gamma_{h/m}^1 \rightarrow \Gamma$ as $m \rightarrow \infty$ even for fixed~$h$}}
 	\label{fig:phi_exact}		
 \end{figure}
 
+For both formulations~\eqref{mtx_exact} and~\eqref{mtx_exact_2} the loading vectors for moments and continuity equations are approximated as
+\begin{align}\begin{split}\label{rhs}
+	\vect f_i &= \int_{\Gamma_{h/m}^{2 \to 1}}^5 \vect f \cdot \vect \phi_i \diff{s}, \quad i = 1, 2, \dots, n_{\vect A}, \\
+	\vect g_i &= -\int_{\Gamma_{h/m}^{2 \to 1}}^5 g\,\phi_i \diff{s}, \quad i = 1, 2, \dots, n_{\vect S},
+\end{split}\end{align}
+respectively. Here $\vect \phi_i$ and $\phi_i$ are vector and scalar Lagrange basis functions defined on $\Omega_h^\Gamma$.
+ 
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}{.5\linewidth}
@@ -231,17 +252,17 @@ The second option is
 		\includegraphicsw[.45]{patches_4_inexact.png}
 	\end{subfigure}%
 	\par\bigskip
-	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^{1/2} - 1$, $h = 8.33\times10^{-1}$. Left: triangular patches~$\gamma \subset \Gamma_{h/2}^1$ (different color corresponds to a different tetrahedron $T \in \Omega^\Gamma_h$). Right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} \ne \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \not\in \bar{P}^2_h$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} \ne \Gamma_{h/m}^1$ for~$m > 2$, and $\Gamma_{h/m}^{2 \rightarrow 1} \rightarrow \Gamma_h^2 \ne \Gamma$ as $m \rightarrow \infty$ for fixed~$h$}}
+	\caption{$\Gamma = \sphere$, $\phi(\vect x) = \|\vect x\|^{1/2} - 1$, $h = 8.33\times10^{-1}$. Left: triangular patches~$\gamma \in \Gamma_{h/2}^1$ (different color corresponds to a different tetrahedron $T \in \Omega^\Gamma_h$). Right: same for~$\Gamma_{h/4}^{2 \rightarrow 1} \ne \Gamma_{h/4}^1$. \textbf{Note that since~$\phi \not\in \bar{P}^2_h$, we have that~$\Gamma_{h/m}^{2 \rightarrow 1} \ne \Gamma_{h/m}^1$ for~$m > 2$, and $\Gamma_{h/m}^{2 \rightarrow 1} \rightarrow \Gamma_h^2 \ne \Gamma$ as $m \rightarrow \infty$ for fixed~$h$}}
 	\label{fig:phi_inexact}		
 \end{figure}
 
-As in~\cite{veclaplace}, we refer to~\eqref{mtx} as \textbf{inconsistent formulation}. We also consider the same formulation as in~~\eqref{mtx} but with the first term~$\vect A_s$ in the definition of~$\vect A$ changed as
+As in~\cite{veclaplace}, we refer to~\eqref{mtx} as \textbf{inconsistent formulation}. We also consider the same formulation as in~\eqref{mtx} but with the first term~$\vect A_s$ in the definition of~$\vect A$ changed as
 \begin{equation}\label{mtx_cons}
-	\langle \vect A_s\,\vec{\vect u}, \vec{\vect v} \rangle \approx \int^5_{\Gamma} 2\,\big( E_{s,\,\Gamma}(\vect u) - (\vect u\cdot\vect n_{\Gamma})\,\vect H_{\Gamma} \big) : \big( E_{s,\,\Gamma}(\vect v) - (\vect v\cdot\vect n)\,\vect H_{\Gamma} \big) \diff{s},
+	\langle \vect A_s\,\vec{\vect u}, \vec{\vect v} \rangle \approx \int_{\Gamma} 2\,\big( E_{s,\,\Gamma}(\vect u) - (\vect u\cdot\vect n_{\Gamma})\,\vect H_{\Gamma} \big) : \big( E_{s,\,\Gamma}(\vect v) - (\vect v\cdot\vect n_\Gamma)\,\vect H_{\Gamma} \big) \diff{s},
 \end{equation}
 where the shape operator is defined as~$\vect H_\Gamma \coloneqq \nabla_\Gamma \vect n_\Gamma \coloneqq \vect P_{\Gamma}\,\nabla \vect n^e_\Gamma\,\vect P_{\Gamma}$, $\vect H_\Gamma : \mathcal{O}(\Gamma) \rightarrow \mathbb{R}^3$. We refer to~\eqref{mtx_cons} as \textbf{consistent formulation}.
 
-Similarly to~\eqref{mtx_exact} and~\eqref{mtx_exact}, we consider two discretizations of~\eqref{mtx_cons}:
+Similarly to~\eqref{mtx_exact} and~\eqref{mtx_exact_2}, we consider two discretizations of~\eqref{mtx_cons}:
 \begin{equation}\label{mtx_cons_exact}
 	\langle \vect A_s\,\vec{\vect u}, \vec{\vect v} \rangle = \int^5_{\Gamma_{h/m}^{2 \to 1}} 2\,\big( E_{s,\,\Gamma_{h}^{2}}(\vect u) - (\vect u\cdot\vect n_{\Gamma_h^2})\,\vect H_{\Gamma_h^2} \big) : \big( E_{s,\,\Gamma_{h}^{2}}(\vect v) - (\vect v\cdot\vect n_{\Gamma_h^2})\,\vect H_{\Gamma_h^2} \big) \diff{s} 
 \end{equation}
@@ -296,7 +317,7 @@ We solve model problem from~\cite[p.\,20]{surfstokes}, $\Gamma = \sphere$\footno
 \end{equation}
 The exact solution on the unit sphere is chosen as 
 \begin{equation}\label{exact_soln_2}
-	\vect u \coloneqq \vect P\,\tilde{\vect u}^e, \quad
+	\vect u \coloneqq \vect P_\Gamma\,\tilde{\vect u}^e, \quad
 	p \coloneqq \tilde p^e.
 \end{equation}
 
