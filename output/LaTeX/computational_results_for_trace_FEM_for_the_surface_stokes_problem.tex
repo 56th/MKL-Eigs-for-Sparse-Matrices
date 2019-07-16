@@ -551,7 +551,7 @@ We use the normal stabilization matrix~$\vect C_n$. We stick to the approach~\eq
 	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = h$, $\rho_p = h$. Matrices are assembled as in~\eqref{mtx_exact_p2}}
 	\label{tab:p2p1_incons_h^1}
 	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+		\begin{tabular}[1.2]{|c||c|c||c|c||c||c|}
 			\hline
 			\multicolumn{7}{|c|}{$m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} \\
 			\hline
@@ -560,9 +560,12 @@ We use the normal stabilization matrix~$\vect C_n$. We stick to the approach~\eq
 			\input{sphere_2_P2P1_patchnormals=0_shift=0.0_form=inconsistent_m=12_rhofac=1_rhopow=1_conv_table.tex}
 		\end{tabular}
 	\end{subtable}
-	\vskip 2mm	
+\end{table}
+\vskip -.6cm
+\begin{table}[H]
+	\centering\footnotesize
 	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c||c|}
+		\begin{tabular}[1.2]{|c||c|c||c||c|}
 			\hline
 			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
 			\hline
@@ -710,7 +713,7 @@ We consider the same formulation as in~\eqref{mtx_exact_p2}, but with the first~
 	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = h$. Matrices are assembled as in~\eqref{mtx_exact_p2}\,--\,\eqref{mtx_exact_p2_cons}}
 	\label{tab:p2p1_cons_h^-1}
 	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c|c||c||c|}
+		\begin{tabular}[1.2]{|c||c|c||c|c||c||c|}
 			\hline
 			\multicolumn{7}{|c|}{$m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} \\
 			\hline
@@ -719,9 +722,12 @@ We consider the same formulation as in~\eqref{mtx_exact_p2}, but with the first~
 			\input{sphere_2_P2P1_patchnormals=0_shift=0.0_form=consistent_m=12_rhofac=1_rhopow=-1_conv_table.tex}
 		\end{tabular}
 	\end{subtable}
-	\vskip 2mm	
+\end{table}	
+\vskip -.6cm
+\begin{table}[H]
+	\centering\footnotesize
 	\begin{subtable}{1.\linewidth}\centering
-		\begin{tabular}[1.3]{|c||c|c||c||c|}
+		\begin{tabular}[1.2]{|c||c|c||c||c|}
 			\hline
 			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
 			\hline
@@ -1083,9 +1089,7 @@ This makes it easy to pick only ``correct'' eigenvalues. To ease the computation
 
 To make sure that results are consistent we solve~\eqref{problem_pert} for~$\epsilon = 10^{-5}$ and~$\epsilon = 10^{-6}$; for the coarse mesh levels we also check that the dense solver for~\eqref{problem} and the iterative one for~\eqref{problem_pert} give solutions that coincide.  
 
-\footnotetext{The majority of generalized eigenvalue solvers require left-hand-side matrix to be Hermitian and right-hand-side matrix to be Hermitian \textbf{positive definite}; that's why we need to introduce $\epsilon > 0$.}     
-
-\clearpage
+\footnotetext{The majority of generalized eigenvalue solvers require left-hand-side matrix to be Hermitian and right-hand-side matrix to be Hermitian \textbf{positive definite}; that's why we need to introduce $\epsilon > 0$.}
 
 \subsection{Dependency of the spectrum on the mesh size}
 
@@ -1097,9 +1101,9 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,
 	\label{tab:p1p1}
 	\begin{subtable}{1.\linewidth}
 		\centering
-		\caption{$\Gamma = \sphere$}
-		\label{tab:p1p1:sph}
 		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|c|c|}
+			\hline
+			\multicolumn{9}{|c|}{$\Gamma = \sphere$} \\
 			\hline
 			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 			\cline{4-9}
@@ -1113,12 +1117,15 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,
 			%		\input{torus_P1P1_res_table.tex}
 		\end{tabular}
 	\end{subtable}%
-	\vskip 2mm
+\end{table}
+\vskip -.6cm
+\begin{table}[H]
+	\centering\footnotesize
 	\begin{subtable}{1.\linewidth}
 		\centering
-		\caption{$\Gamma = \tor$}
-		\label{tab:p1p1:tor}
-		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
+		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|c|c|}
+			\hline
+			\multicolumn{9}{|c|}{$\Gamma = \sphere$} \\
 			\hline
 			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 			\cline{4-9}
@@ -1155,9 +1162,9 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,
 	\label{tab:p2p1}
 	\begin{subtable}{1.\linewidth}
 		\centering
-		\caption{$\Gamma = \sphere$}
-		\label{tab:p2p1:sph}
 		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|c|c|}
+			\hline
+			\multicolumn{9}{|c|}{$\Gamma = \sphere$} \\
 			\hline
 			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 			\cline{4-9}
@@ -1166,20 +1173,6 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,
 			\input{sphere_2_P2P1_consistent_table.tex}
 		\end{tabular}
 	\end{subtable}%
-%	\vskip 3mm
-%	\begin{subtable}{1.\linewidth}
-%		\centering
-%		\caption{$\Gamma = \tor$}
-%		\label{tab:p2p1:tor}
-%		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
-%			\hline
-%			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%			\cline{4-9}
-%			& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-%			\hline
-%			\input{torus_P2P1_table.tex}
-%		\end{tabular}
-%	\end{subtable}
 \end{table}
 \begin{figure}[H]
 	\centering\small
