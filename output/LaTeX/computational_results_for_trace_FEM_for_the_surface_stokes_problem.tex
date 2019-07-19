@@ -34,7 +34,7 @@
 
 \usepackage{geometry}
 \newgeometry{
-	left=.8cm, right=.8cm, top=.8cm, bottom=.8cm,
+	left=1.5cm, right=1cm, top=1cm, bottom=1cm,
 	includefoot, heightrounded
 }
 
@@ -84,6 +84,9 @@
 	tabsize=2,
 	belowskip=-1pt
 } 
+
+% https://tex.stackexchange.com/questions/9425/how-to-fix-footnote-position-at-the-bottom-of-the-page
+\usepackage[bottom]{footmisc}
 
 \title{Some computational results for $\vect{P}_1$\,--\,$P_1$ and $\vect{P}_2$\,--\,$P_1$ Trace\,FEM for the surface Stokes problem}
 \author{
@@ -160,14 +163,14 @@ respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega^\
 
 \subsection{Quadratures for bilinear forms}
 
-We denote by~$P_h^n \subset \bar P_h^n$ spaces of continuous and discontinuous nodal~$P_n$ interpolants defined on~$\Omega_\Gamma^h$, respectively. For a function~$f$, $I_h^n(f) \in P_h^n$ is the corresponding interpolant; we will use the notation~$f_h^n$ to emphasize that~$f_h^n \in P_h^n$ and~$f_h^n$ approximates~$f$ in some sense, but~$I_h^n(f) \ne f_h^n$.
+We denote by~$P_h^n \subset \bar P_h^n$ spaces of continuous and discontinuous nodal~$P_n$ interpolants defined on~$\Omega_h^\Gamma$, respectively. For a function~$f$, $I_h^n(f) \in P_h^n$ is the corresponding interpolant; we will use the notation~$f_h^n$ to emphasize that~$f_h^n \in P_h^n$ and~$f_h^n$ approximates~$f$ in some sense, but~$I_h^n(f) \ne f_h^n$.
 
 We set
 \begin{align}\label{gammah}
 	\Gamma_h^n &\coloneqq \{ \vect x \in \mathbb{R}^3 : \big(I_h^n(\phi)\big)(\vect x) = 0 \}, \\
 	\vect n_{\Gamma_h^n} &= \frac{\nabla I_h^n(\phi)}{\|\nabla I_h^n(\phi)\|} \not\in \bar{P}_h^m\text{ for any $m$ if $n > 1$}. \label{gammah:n}
 \end{align}  
-	Note that~$\Gamma_h^n$ is a continuous piecewise $P_n$ surface in~$\Omega_\Gamma^h$, and $\Gamma_h^n \ne I_h^n(\Gamma)$. The unit normal~$\vect n_{\Gamma_h^n}$ is not a rational function; it is continuous in~$T \in \Omega_\Gamma^h$ and discontinuous on faces. We also define
+	Note that~$\Gamma_h^n$ is a continuous piecewise $P_n$ surface in~$\Omega_h^\Gamma$, and $\Gamma_h^n \ne I_h^n(\Gamma)$. The unit normal~$\vect n_{\Gamma_h^n}$ is not a rational function; it is continuous in~$T \in \Omega_h^\Gamma$ and discontinuous on faces. We also define
 \begin{equation}\label{gammah2}
 	\Gamma_{h/m}^{2 \rightarrow 1} \coloneqq \{ \vect x \in \mathbb{R}^3 : \Big(I_{h/m}^1\big(I_h^2(\phi)\big)\Big)(\vect x) = 0 \}.
 \end{equation}  
@@ -387,7 +390,7 @@ We consider two choices for virtual refinement: $m \propto h^{-1/2}$ and $m \pro
 
 \begin{table}[H]
 	\centering\footnotesize
-	\caption{Errors for normals and shape operator. Please see~\eqref{exact_soln_simpl} and~\eqref{exact_soln_conv}}
+	\caption{Errors for normals and shape operator, $\Gamma = \sphere$. Please see~\eqref{exact_soln_simpl} and~\eqref{exact_soln_conv}}
 	\label{tab:shape_normal_conv}
 	\begin{subtable}{1.\linewidth}\centering
 		\begin{tabular}[1.4]{|c||c||c|c||c|c|}
@@ -703,7 +706,7 @@ For statistics: using 64 CPUs, computation of the meshlevel~3 ($h = 2.08\times10
 %Convergence results for~\eqref{mtx_exact_2_cons_upd} are presented in Table~\ref{tab:p2p1_cons_upd_h^-1}.
 %
 %For statistics: using 80 CPUs, computation of the meshlevel~7 ($h = 1.3\times10^{-2}$) takes~${\sim}74.3$ hours with $m = 64$ (computation also involves errors for normals and the shape operator).
-We consider the same formulation as in~\eqref{mtx_exact_p2}, but with the first~$\vect A_s$ term in the definition of~$\vect A$ changed according to~\eqref{mtx_cons_exact}. Thus with~\eqref{exact_soln_simpl} we have
+We consider the same formulation as in~\eqref{mtx_exact_p2}, but with the first term~$\vect A_s$ in the definition of~$\vect A$ changed according to~\eqref{mtx_cons_exact}. Thus with~\eqref{exact_soln_simpl} we have
 \begin{align}\label{mtx_exact_p2_cons}
 	\langle \vect A_s\,\vec{\vect u}, \vec{\vect v} \rangle = \int^5_{\Gamma_{h/m}^1} 2\,\big( E_{s,\,\Gamma}(\vect u) - (\vect u\cdot\vect n_{\Gamma})\,\vect H_{\Gamma} \big) : \big( E_{s,\,\Gamma}(\vect v) - (\vect v\cdot\vect n_{\Gamma})\,\vect H_{\Gamma} \big) \diff{s}.
 \end{align}
@@ -1093,7 +1096,7 @@ To make sure that results are consistent we solve~\eqref{problem_pert} for~$\eps
 
 \subsection{Dependency of the spectrum on the mesh size}
 
-Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,$P_1$, and consistent $\vect P_2$\,--\,$P_1$ approaches.
+Here we test inconsistent $\vect P_1$\,--\,$P_1$ and consistent $\vect P_2$\,--\,$P_1$ approaches.
 
 \begin{table}[H]
 	\centering\footnotesize
@@ -1125,7 +1128,7 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,
 		\centering
 		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|c|c|}
 			\hline
-			\multicolumn{9}{|c|}{$\Gamma = \sphere$} \\
+			\multicolumn{9}{|c|}{$\Gamma = \tor$} \\
 			\hline
 			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
 			\cline{4-9}
@@ -1153,7 +1156,7 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,
 		\includegraphicsw{torus_P1P1.png}
 		%\caption{$\vect P_1$\,--\,$P_1$ for $\tor$}
 	\end{subfigure}
-	\caption{Log-log plot of~$\lambda_2$ for Tables~\ref{tab:p1p1}\subref{tab:p1p1:sph} (left) and~\ref{tab:p1p1}\subref{tab:p1p1:tor} (right)}
+	\caption{Log-log plot of~$\lambda_2$ for Table~\ref{tab:p1p1}. Left: $\Gamma = \sphere$, right: $\Gamma = \tor$}
 \end{figure}
 
 \begin{table}[H]
@@ -1185,7 +1188,7 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$, inconsistent $\vect P_2$\,--\,
 %		\centering
 %		\includegraphicsw{torus_P2P1.png}
 %	\end{subfigure}
-	\caption{Log-log plot of~$\lambda_2$ for Table~\ref{tab:p2p1}\subref{tab:p2p1:sph}}
+	\caption{Log-log plot of~$\lambda_2$ for Table~\ref{tab:p2p1}}
 \end{figure}
 
 \subsection{Sensitivity of the spectrum to levelset shifts}
@@ -1315,7 +1318,7 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %		\includegraphicsw[.7]{{shift_0.2.cropped}.png}
 %		\caption{$\sphere + \alpha\,\vect s$}
 %	\end{subfigure}%
-%	\caption{The unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (0, 1, 1)^T/\sqrt{2}$, $\alpha = 0.2$, and $h = 2.08\times10^{-1}$. The bulk mesh~$\Omega_\Gamma^h$ is computed for~$\sphere$ and then used for~$\sphere + \alpha\,\vect s$}
+%	\caption{The unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (0, 1, 1)^T/\sqrt{2}$, $\alpha = 0.2$, and $h = 2.08\times10^{-1}$. The bulk mesh~$\Omega_h^\Gamma$ is computed for~$\sphere$ and then used for~$\sphere + \alpha\,\vect s$}
 %	\label{fig:shift}		
 %\end{figure}
 %
@@ -1355,14 +1358,14 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %
 %\subsection{Notations}\label{subsec:not}
 %
-%We denote by~$P_h^n \subset \bar P_h^n$ spaces of continuous and discontinuous nodal~$P_n$ interpolants defined on~$\Omega_\Gamma^h$, respectively. For a function~$f$, $I_h^n(f) \in P_h^n$ is the corresponding interpolant; we will use the notation~$f_h^n$ to emphasize that~$f_h^n \in P_h^n$ and~$f_h^n$ approximates~$f$ in some sense, but~$I_h^n(f) \ne f_h^n$.
+%We denote by~$P_h^n \subset \bar P_h^n$ spaces of continuous and discontinuous nodal~$P_n$ interpolants defined on~$\Omega_h^\Gamma$, respectively. For a function~$f$, $I_h^n(f) \in P_h^n$ is the corresponding interpolant; we will use the notation~$f_h^n$ to emphasize that~$f_h^n \in P_h^n$ and~$f_h^n$ approximates~$f$ in some sense, but~$I_h^n(f) \ne f_h^n$.
 %
 %We set
 %\begin{align}\label{gammah}
 %	\Gamma_h^n &\coloneqq \{ \vect x \in \mathbb{R}^3 : \big(I_h^n(\phi)\big)(\vect x) = 0 \}, \\
 %	\vect n_{\Gamma_h^n} &= \frac{\nabla I_h^n(\phi)}{\|\nabla I_h^n(\phi)\|} \not\in \bar{P}_h^m\text{ for any $m$ if $n > 1$}. \label{gammah:n}
 %\end{align}  
-%Note that~$\Gamma_h^n$ is a continuous piecewise $P_n$ surface in~$\Omega_\Gamma^h$, and $\Gamma_h^n \ne I_h^n(\Gamma)$. The unit normal~$\vect n_{\Gamma_h^n}$ is not a rational function; it is continuous in~$T \in \Omega_\Gamma^h$ and discontinuous on faces. We also define
+%Note that~$\Gamma_h^n$ is a continuous piecewise $P_n$ surface in~$\Omega_h^\Gamma$, and $\Gamma_h^n \ne I_h^n(\Gamma)$. The unit normal~$\vect n_{\Gamma_h^n}$ is not a rational function; it is continuous in~$T \in \Omega_h^\Gamma$ and discontinuous on faces. We also define
 %\begin{equation}\label{gammah2}
 %	\Gamma_{h/m}^{2 \rightarrow 1} \coloneqq \{ \vect x \in \mathbb{R}^3 : \Big(I_{h/m}^1\big(I_h^2(\phi)\big)\Big)(\vect x) = 0 \}.
 %\end{equation}  
@@ -1387,7 +1390,7 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %levelset_fun = &sphere_2;
 %\end{lstlisting}
 %\vskip .2cm
-%Continuous piecewise $P_2$ interpolant~$I_h^2(\phi)$ of $\phi$ is built on~$\Omega_\Gamma^h$ via iterating over vertices and edges of~$\Omega_\Gamma^h$. It is stored in~\texttt{lset} object:
+%Continuous piecewise $P_2$ interpolant~$I_h^2(\phi)$ of $\phi$ is built on~$\Omega_h^\Gamma$ via iterating over vertices and edges of~$\Omega_h^\Gamma$. It is stored in~\texttt{lset} object:
 %\begin{lstlisting}
 %// levelset.cpp
 %void LevelsetP2ContCL::Init( instat_scalar_fun_ptr phi0, double t) {
@@ -1413,7 +1416,7 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %\begin{lstlisting}
 %SetupNavierStokesIF_P1P1(mg, &A, /* ... */ lset.Phi, /* ... */);
 %\end{lstlisting}
-%(\textbf{Interestingly enough}, this function does not get~\texttt{lset} object that represents the interpolant; it gets only~\texttt{lset.Phi}, which is the object of type~\texttt{VecDescCL}. \texttt{lset.Phi} is essentially just a vector of values of~$\phi$ at interpolation points (i.e. vertices and edges' centroids of~$\Omega_\Gamma^h$). That is, the assembling function above has no idea what~\texttt{lset.Phi} actually represents: one may interpret it as an element of~$P_h^2$ or e.g. $P_{h/2}^1$. Who knows?..)
+%(\textbf{Interestingly enough}, this function does not get~\texttt{lset} object that represents the interpolant; it gets only~\texttt{lset.Phi}, which is the object of type~\texttt{VecDescCL}. \texttt{lset.Phi} is essentially just a vector of values of~$\phi$ at interpolation points (i.e. vertices and edges' centroids of~$\Omega_h^\Gamma$). That is, the assembling function above has no idea what~\texttt{lset.Phi} actually represents: one may interpret it as an element of~$P_h^2$ or e.g. $P_{h/2}^1$. Who knows?..)
 % 
 %\textbf{No} interpolation is built explicitly for~$\vect n_{\Gamma_h^2}$ in~\eqref{gammah:n}; it is implicitly represented via \texttt{qnormal} data field:
 %\begin{lstlisting}
@@ -1442,11 +1445,11 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %	// ...
 %}
 %\end{lstlisting}
-%First $\nabla I_h^2(\phi|_T)$ is built (locally for a tetrahedron~$T \in \Omega_\Gamma^h$ represented by~\texttt{tet}) and saved to \texttt{Normals} object. \texttt{ls[i]} gives the value of~$\phi|_T$ at $i$th node (vertices and edges' centroids\,---\,there are 10 of them for tetrahedra), and \texttt{P2Grad[i]} represents the gradient of quadratic basis function which itself is linear. (Actually, it is sufficient to have $4 < 10$ linear functions to represent $\nabla I_h^2(\phi|_T)$, but this is how it is implemented here.) Finally, \texttt{qnormal} object is built via evaluating \texttt{Normals} at quadrature nodes and normalization.
+%First $\nabla I_h^2(\phi|_T)$ is built (locally for a tetrahedron~$T \in \Omega_h^\Gamma$ represented by~\texttt{tet}) and saved to \texttt{Normals} object. \texttt{ls[i]} gives the value of~$\phi|_T$ at $i$th node (vertices and edges' centroids\,---\,there are 10 of them for tetrahedra), and \texttt{P2Grad[i]} represents the gradient of quadratic basis function which itself is linear. (Actually, it is sufficient to have $4 < 10$ linear functions to represent $\nabla I_h^2(\phi|_T)$, but this is how it is implemented here.) Finally, \texttt{qnormal} object is built via evaluating \texttt{Normals} at quadrature nodes and normalization.
 %
 %Objects \texttt{qnormal} for surface integrals and \texttt{q3Dnormal} for volume integrals are used in approximation of~$\vect P = \vect I - \vect n\,\vect n^T$, normal derivatives, and taking-normal-components in~\eqref{mtx}. \texttt{q3Dnormal} is constructed as~\texttt{qnormal} but for quadrature points of tetrahedrons, not triangles. 
 %
-%For one, $\vect P\,\nabla f_h^2$, $f_h^2 \coloneqq P_2$ basis function on~$\Omega_\Gamma^h$, is approximated via~\texttt{qsurfP2grad} object:
+%For one, $\vect P\,\nabla f_h^2$, $f_h^2 \coloneqq P_2$ basis function on~$\Omega_h^\Gamma$, is approximated via~\texttt{qsurfP2grad} object:
 %\begin{lstlisting}
 %// ifacetransp.cpp
 %void LocalStokesCL::calcIntegrands(/* ... */) {
@@ -1468,9 +1471,9 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %}
 %\end{lstlisting}
 %
-%\subsection{Quadrature rules for~$\int_{\Gamma}$ and $\int_{\Omega_\Gamma^h}$}\label{subsec:integrals}
+%\subsection{Quadrature rules for~$\int_{\Gamma}$ and $\int_{\Omega_h^\Gamma}$}\label{subsec:integrals}
 %
-%All the 3D integrals in~\eqref{mtx} are computed via iteration over~$T \in \Omega_\Gamma^h$ without any virtual refinements. \texttt{q3Ddomain} object represents the set of quadrature nodes and weights:
+%All the 3D integrals in~\eqref{mtx} are computed via iteration over~$T \in \Omega_h^\Gamma$ without any virtual refinements. \texttt{q3Ddomain} object represents the set of quadrature nodes and weights:
 %\begin{lstlisting}
 %// ifacetransp.cpp
 %void LocalStokesCL::calc3DIntegrands(/* ... */) {
@@ -1480,14 +1483,14 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %\end{lstlisting} 
 %It is used e.g. in~\texttt{setupA\_P1\_stab} above. 15 nodes and weights are used, and the quadrature is exact for functions in~$\bar P_h^5$.
 %
-%All the surface integrals are also computed via iteration over~$T \in \Omega_\Gamma^h$, but using~$\Gamma_{h/2}^1$. One extra ``virtual'' refinement is achieved via setting 
+%All the surface integrals are also computed via iteration over~$T \in \Omega_h^\Gamma$, but using~$\Gamma_{h/2}^1$. One extra ``virtual'' refinement is achieved via setting 
 %\begin{lstlisting}
 %// ifacetransp.cpp
 %LocalStokesCL(bool fullGradient) 
 %	: lat(PrincipalLatticeCL::instance(2))
 %	, /* ... */ { /* ... */ }
 %\end{lstlisting}
-%\texttt{PrincipalLatticeCL::instance(2)} means that each edge of the tetrahedron~$T \in \Omega_\Gamma^h$ is split into 2 edges, and~$T$ is split into 8 smaller tetrahedrons. Changing 2 to 4 will give us~$\Gamma_{h/4}^{2 \rightarrow 1}$ from~\eqref{gammah2} and so forth. \texttt{q2Ddomain} object represents the set of quadrature nodes and weights:
+%\texttt{PrincipalLatticeCL::instance(2)} means that each edge of the tetrahedron~$T \in \Omega_h^\Gamma$ is split into 2 edges, and~$T$ is split into 8 smaller tetrahedrons. Changing 2 to 4 will give us~$\Gamma_{h/4}^{2 \rightarrow 1}$ from~\eqref{gammah2} and so forth. \texttt{q2Ddomain} object represents the set of quadrature nodes and weights:
 %\begin{lstlisting}
 %// ifacetransp.cpp
 %void LocalStokesCL::calcIntegrands(/* ... */) {
@@ -1498,7 +1501,7 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %	// ...
 %}
 %\end{lstlisting} 
-%Each linear subsurface in~$T \in \Omega_\Gamma^h$ has 7 quadrature nodes and weights, and the quadrature rule is again exact for functions in~$\bar P_h^5$.
+%Each linear subsurface in~$T \in \Omega_h^\Gamma$ has 7 quadrature nodes and weights, and the quadrature rule is again exact for functions in~$\bar P_h^5$.
 %
 %\texttt{spatch} represents a set of triangles that form~$\Gamma_{h/2}^1$ inside~$T$. That is, in order to approximate zeros of~$\phi$, $I_{h/2}^1\big(I_{h}^2(\phi)\big) = I_{h/2}^1(\phi)$ is used:
 %\begin{lstlisting}
@@ -1574,7 +1577,7 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 %%\end{equation}
 %%Thus we define~$\vect H_{\Gamma^2_h}$ to be as in~\eqref{H} but with $\phi$ replaced with~$I^2_h(\phi)$. Indeed, computation of~$\vect H_{\Gamma^2_h}$ requires Hessians of shape functions, but luckily this routine was implemented in DROPS.
 %%
-%%Note that if~$\phi$ is piecewise quadratic on~$\Omega_\Gamma^h$, then~$\vect H_{\Gamma^2_h}$ is represented \textbf{exactly}. I actually checked it via computing~$\vect H_{\Gamma^2_h}$ at several points in DROPS and compared it to~$\vect H$ for~$\sphere$. 
+%%Note that if~$\phi$ is piecewise quadratic on~$\Omega_h^\Gamma$, then~$\vect H_{\Gamma^2_h}$ is represented \textbf{exactly}. I actually checked it via computing~$\vect H_{\Gamma^2_h}$ at several points in DROPS and compared it to~$\vect H$ for~$\sphere$. 
 %%
 %%Comments:
 %%
