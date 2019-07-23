@@ -1,19 +1,20 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
-If[Length@$ScriptCommandLine < 7, Print["Error: please specify surface, formulation, meshlevel, shift, [all|0|n|full], [mat|mtx]"]; Quit[]];
+If[Length@$ScriptCommandLine < 8, Print["Error: please specify surface, test, formulation, meshlevel, shift, {all|0|n|full}, {mat|mtx}"]; Quit[]];
 surface = $ScriptCommandLine[[2]];
-form = $ScriptCommandLine[[3]];
-meshLevel = ToExpression@$ScriptCommandLine[[4]];
-shift = $ScriptCommandLine[[5]];
-If[$ScriptCommandLine[[6]] != "all", stab = {$ScriptCommandLine[[6]]}, stab = {"0", "n", "full"}];
-fmt = $ScriptCommandLine[[7]];
+test = $ScriptCommandLine[[3]];
+form = $ScriptCommandLine[[4]];
+meshLevel = ToExpression@$ScriptCommandLine[[5]];
+shift = $ScriptCommandLine[[6]];
+If[$ScriptCommandLine[[7]] != "all", stab = {$ScriptCommandLine[[7]]}, stab = {"0", "n", "full"}];
+fmt = $ScriptCommandLine[[8]];
 
 
 h = {0.833332,0.416666,0.208333,0.104167,0.052083,0.026042,0.013021};
 hStr=If[StringLength@#<8,#<>StringJoin@Table["0",{8-StringLength@#}],#]&/@ToString/@h;
 Print["h = ", hStr[[meshLevel]]];
-inDir = "../../drops/output/NavierStokes_"<>surface<>"/test85_h="<>hStr[[meshLevel]]<>"/shift="<>shift<>"_form="<>form<>"_";
+inDir = "../../drops/output/NavierStokes_"<>surface<>"/test"<>test<>"_h="<>hStr[[meshLevel]]<>"/shift="<>shift<>"_form="<>form<>"_";
 Print["input:  ", inDir, "*"];
 Print[""];
 
