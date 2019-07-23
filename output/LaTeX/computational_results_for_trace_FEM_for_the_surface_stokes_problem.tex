@@ -1177,18 +1177,35 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$ and consistent $\vect P_2$\,--\
 		\end{tabular}
 	\end{subtable}%
 \end{table}
+\vskip -.6cm
+\begin{table}[H]
+	\centering\footnotesize
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|c|c|}
+			\hline
+			\multicolumn{9}{|c|}{$\Gamma = \tor$} \\
+			\hline
+			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{4-9}
+			& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{torus_P2P1_consistent_table.tex}
+		\end{tabular}
+	\end{subtable}%
+\end{table}
 \begin{figure}[H]
 	\centering\small
 	\begin{subfigure}{.49\linewidth}
 		\centering
 		\includegraphicsw{sphere_2_P2P1_consistent.png}
 	\end{subfigure}%
-%	\hfill
-%	\begin{subfigure}{.49\linewidth}
-%		\centering
-%		\includegraphicsw{torus_P2P1.png}
-%	\end{subfigure}
-	\caption{Log-log plot of~$\lambda_2$ for Table~\ref{tab:p2p1}}
+	\hfill
+	\begin{subfigure}{.49\linewidth}
+		\centering
+		\includegraphicsw{torus_P2P1_consistent.png}
+	\end{subfigure}
+	\caption{Log-log plot of~$\lambda_2$ for Table~\ref{tab:p2p1}. Left: $\Gamma = \sphere$, right: $\Gamma = \tor$}
 \end{figure}
 
 \subsection{Sensitivity of the spectrum to levelset shifts}
@@ -1201,16 +1218,18 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}{.5\linewidth}
+	\begin{subfigure}{.2\linewidth}\end{subfigure}%
+	\begin{subfigure}{.3\linewidth}
 		\centering
-		\includegraphicsw[.6]{{shift_0.0.cropped}.png}
+		\includegraphicsw[.9]{{shift_0.0.cropped}.png}
 		\caption{$\sphere$}
 	\end{subfigure}%
-	\begin{subfigure}{.5\linewidth}
+	\begin{subfigure}{.3\linewidth}
 		\centering
-		\includegraphicsw[.6]{{shift_0.4.cropped}.png}
+		\includegraphicsw[.9]{{shift_0.4.cropped}.png}
 		\caption{$\sphere + \alpha\,\vect s$}
 	\end{subfigure}%
+	\begin{subfigure}{.2\linewidth}\end{subfigure}%
 	\caption{$\|\vect u_h\|$ on the unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (1, 1, 1)^T/\sqrt{3}$, $\alpha = 0.4$, and $h = 1.04\times10^{-1}$}
 	\label{fig:shift}		
 \end{figure}
@@ -1231,19 +1250,21 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 			\input{sphere_2_P2P1_consistent_h=0.104167_table.tex}
 		\end{tabular}
 	\end{subtable}
-%	\vskip 4mm
-%	\begin{subtable}{1.\linewidth}
-%		\centering
-%		\caption{$\vect P_2$\,--\,$P_1$}
-%		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|}
-%			\hline
-%			\multirow{2}{*}{Surface} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%			\cline{2-7}
-%			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-%			\hline
-%			\input{sphere_2_P2P1_h=0.104167_table.tex}
-%		\end{tabular}%
-%	\end{subtable}
+\end{table}
+\vskip -.6cm
+\begin{table}[H]
+	\centering\footnotesize
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|}
+			\hline
+			\multirow{2}{*}{Surface} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{2-7}
+			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
+			\hline
+			\input{torus_P2P1_consistent_h=0.104167_table.tex}
+		\end{tabular}
+	\end{subtable}
 \end{table}
 
 %\clearpage
