@@ -129,37 +129,39 @@ respectively. We use notations as in~\cite{surfstokes}, in particular, $\Omega^\
 	\begin{subfigure}{.25\linewidth}
 		\centering
 		\includegraphicsw[.9]{{lvl1.cropped}.png}
-		\caption{$h = 8.33\times10^{-1}$}
-	\end{subfigure}%
-	\begin{subfigure}{.25\linewidth}
-		\centering
-		\includegraphicsw[.9]{{lvl2.cropped}.png}
 		\caption{$h = 4.17\times10^{-1}$}
 	\end{subfigure}%
 	\begin{subfigure}{.25\linewidth}
 		\centering
-		\includegraphicsw[.9]{{lvl3.cropped}.png}
+		\includegraphicsw[.9]{{lvl2.cropped}.png}
 		\caption{$h = 2.08\times10^{-1}$}
+	\end{subfigure}%
+	\begin{subfigure}{.25\linewidth}
+		\centering
+		\includegraphicsw[.9]{{lvl3.cropped}.png}
+		\caption{$h = 1.04\times10^{-1}$}
 	\end{subfigure}
 	\par\bigskip
 	\begin{subfigure}{.25\linewidth}
 		\centering
 		\includegraphicsw[.9]{{tor_lvl3.cropped}.png}
-		\caption{$h = 2.08\times10^{-1}$}
-	\end{subfigure}%
-	\begin{subfigure}{.25\linewidth}
-		\centering
-		\includegraphicsw[.9]{{tor_lvl4.cropped}.png}
 		\caption{$h = 1.04\times10^{-1}$}
 	\end{subfigure}%
 	\begin{subfigure}{.25\linewidth}
 		\centering
-		\includegraphicsw[.9]{{tor_lvl5.cropped}.png}
+		\includegraphicsw[.9]{{tor_lvl4.cropped}.png}
 		\caption{$h = 5.21\times10^{-2}$}
+	\end{subfigure}%
+	\begin{subfigure}{.25\linewidth}
+		\centering
+		\includegraphicsw[.9]{{tor_lvl5.cropped}.png}
+		\caption{$h = 2.6\times10^{-2}$}
 	\end{subfigure}
-	\caption{First three mesh levels for~$\sphere$ (top) and $\tor$ (bottom)}
+	\caption{Cutaway of the bulk mesh and $\Gamma_h$ for $\ell = 1, 2, 3$ for~$\sphere$ (top) and $\tor$ (bottom)}
 	\label{fig:gamma}		
 \end{figure}
+
+To build the initial triangulation, we divide $\Omega$ into $2^3$ cubes and further tessellate each cube into 6 tetrahedra. Then the mesh is gradually refined towards the surface, and $\ell\in\mathbb{N}$ denotes the level of refinement, with the mesh size $h_\ell = \frac 53\,2^{-\ell}$; see Figure~\ref{fig:gamma} for the illustration of the bulk meshes and the induced mesh on the embedded surface for three consecutive refinement levels.
 
 \subsection{Quadratures for bilinear forms}
 
@@ -1090,7 +1092,26 @@ with $0 < \epsilon \ll 1$. For $\mathcal A_0$ and $\mathcal M^\epsilon_0$ we hav
 \end{equation}
 This makes it easy to pick only ``correct'' eigenvalues. To ease the computation further we replace the $(1, 1)$-block of~$\mathcal M^\epsilon_\star$ with $\epsilon\,\vect I$. 
 
-To make sure that results are consistent we solve~\eqref{problem_pert} for~$\epsilon = 10^{-5}$ and~$\epsilon = 10^{-6}$; for the coarse mesh levels we also check that the dense solver for~\eqref{problem} and the iterative one for~\eqref{problem_pert} give solutions that coincide.  
+To make sure that results are consistent we solve~\eqref{problem_pert} for~$\epsilon = 10^{-5}$ and~$\epsilon = 10^{-6}$; for the coarse mesh levels we also check that the dense solver for~\eqref{problem} and the iterative one for~\eqref{problem_pert} give solutions that coincide in finite precision. See Table~\ref{tab:p2p1_diff}.
+
+\begin{table}[H]
+	\centering\footnotesize
+	\caption{Eigenvalues differences: dense solver for~\eqref{problem} and the iterative solver for~\eqref{problem_pert}. Corresponding eigenvalues are denoted as $\{\lambda_i\}$ and $\{\lambda_i^\mu\}$. Results are shown for consistent $\vect P_2$\,--\,$P_1$, $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = h$, $m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} 
+	\label{tab:p2p1_diff}
+	\begin{subtable}{1.\linewidth}
+		\centering
+		\begin{tabular}[1.2]{|c|c|c|c|c|c|c|}
+			\hline
+			\multicolumn{7}{|c|}{$\Gamma = \sphere$} \\
+			\hline
+			\multirow{2}{*}{$h$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
+			\cline{2-7}
+			& $|\lambda_2 - \lambda_2^\mu|$ & $|\lambda_{n_{\vect S}} - \lambda_{n_{\vect S}}^\mu|$ & $|\lambda_2 - \lambda_2^\mu|$ & $|\lambda_{n_{\vect S}} - \lambda_{n_{\vect S}}^\mu|$ & $|\lambda_2 - \lambda_2^\mu|$ & $|\lambda_{n_{\vect S}} - \lambda_{n_{\vect S}}^\mu|$ \\ 
+			\hline
+			\input{sphere_2_P2P1_consistent_diff_table.tex}
+		\end{tabular}
+	\end{subtable}%
+\end{table}  
 
 \footnotetext{The majority of generalized eigenvalue solvers require left-hand-side matrix to be Hermitian and right-hand-side matrix to be Hermitian \textbf{positive definite}; that's why we need to introduce $\epsilon > 0$.}
 
@@ -1230,7 +1251,7 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 		\caption{$\sphere + \alpha\,\vect s$}
 	\end{subfigure}%
 	\begin{subfigure}{.2\linewidth}\end{subfigure}%
-	\caption{$\|\vect u_h\|$ on the unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (1, 1, 1)^T/\sqrt{3}$, $\alpha = 0.4$, and $h = 1.04\times10^{-1}$}
+	\caption{$\|\vect u_h\|$ on the unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (1, 1, 1)^T/\sqrt{3}$, $\alpha = 0.4$, and $h = 5.21\times10^{-2}$}
 	\label{fig:shift}		
 \end{figure}
 
