@@ -578,6 +578,7 @@ We use the normal stabilization matrix~$\vect C_n$. We stick to the approach~\eq
 		\end{tabular}
 	\end{subtable}
 \end{table}
+\addtocounter{table}{-1}
 
 %\begin{table}[H]
 %	\centering\footnotesize
@@ -740,8 +741,67 @@ We consider the same formulation as in~\eqref{mtx_exact_p2}, but with the first 
 		\end{tabular}
 	\end{subtable}
 \end{table}
+\addtocounter{table}{-1}
 
 For statistics: using 80 CPUs, computation of the meshlevel~7 ($h = 1.3\times10^{-2}$) takes~${\sim}27$ hours with $m = 18$ (computation also involves errors for normals and the shape operator).
+
+\begin{table}[H]
+	\centering\footnotesize
+	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = h^{-1}$. Matrices are assembled as in~\eqref{mtx_exact_p2}\,--\,\eqref{mtx_exact_p2_cons}}
+	\label{tab:p2p1_cons_h^-1_h^-1}
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.2]{|c||c|c||c|c||c||c|}
+			\hline
+			\multicolumn{7}{|c|}{$m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} \\
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=0_shift=0.0_form=consistent_m=12_rhopfac=1_rhoppow=-1_rhoufac=1_rhoupow=-1_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}	
+\vskip -.6cm
+\begin{table}[H]
+	\centering\footnotesize
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.2]{|c||c|c||c||c|}
+			\hline
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=0_shift=0.0_form=consistent_m=12_rhopfac=1_rhoppow=-1_rhoufac=1_rhoupow=-1_iters_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}
+\addtocounter{table}{-1}
+
+\begin{table}[H]
+	\centering\footnotesize
+	\caption{Convergence results. $\tau = h^{-2}$, $\rho_u = h^{-1}$, $\rho_p = 1$. Matrices are assembled as in~\eqref{mtx_exact_p2}\,--\,\eqref{mtx_exact_p2_cons}}
+	\label{tab:p2p1_cons_h^-1_h^0}
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.2]{|c||c|c||c|c||c||c|}
+			\hline
+			\multicolumn{7}{|c|}{$m \in \vect m_{1/2}$ as in Figure~\ref{fig:m}} \\
+			\hline
+			$h$ & $\|\vect u - \vect u_h\|_{\HOne}$ & Order & $\|\vect u - \vect u_h\|_{\LTwo}$ & Order & $\|p - p_h\|_{\LTwo}$ & Order \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=0_shift=0.0_form=consistent_m=12_rhopfac=1_rhoppow=0_rhoufac=1_rhoupow=-1_conv_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}	
+\vskip -.6cm
+\begin{table}[H]
+	\centering\footnotesize
+	\begin{subtable}{1.\linewidth}\centering
+		\begin{tabular}[1.2]{|c||c|c||c||c|}
+			\hline
+			$h$ & $\| \vect u_h\cdot\vect n \|_{\LTwo}$ & Order & Outer iterations & Residual norm \\
+			\hline
+			\input{sphere_2_P2P1_patchnormals=0_shift=0.0_form=consistent_m=12_rhopfac=1_rhoppow=0_rhoufac=1_rhoupow=-1_iters_table.tex}
+		\end{tabular}
+	\end{subtable}
+\end{table}
+\addtocounter{table}{-1}
 
 %\begin{table}[h!]
 %	\centering\footnotesize
@@ -1164,6 +1224,7 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$ and consistent $\vect P_2$\,--\
 		\end{tabular}
 	\end{subtable}
 \end{table}
+\addtocounter{table}{-1}
 \begin{figure}[H]
 	\centering\small
 	\begin{subfigure}{.49\linewidth}
@@ -1215,6 +1276,7 @@ Here we test inconsistent $\vect P_1$\,--\,$P_1$ and consistent $\vect P_2$\,--\
 		\end{tabular}
 	\end{subtable}%
 \end{table}
+\addtocounter{table}{-1}
 \begin{figure}[H]
 	\centering\small
 	\begin{subfigure}{.49\linewidth}
@@ -1287,6 +1349,7 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 		\end{tabular}
 	\end{subtable}
 \end{table}
+\addtocounter{table}{-1}
 
 %\clearpage
 %\vfill
