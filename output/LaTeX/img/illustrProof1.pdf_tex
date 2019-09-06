@@ -55,11 +55,11 @@
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{illustrProof1.pdf}}%
     \put(0.0524313,0.31935428){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\rotatebox{10}{$\Gamma$}\end{tabular}}}}%
-    \put(0.39537033,0.26938355){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\rotatebox{-18}{$\textcolor{BurntOrange}{P_\Gamma(T)}$}\end{tabular}}}}%
+    \put(0.39537033,0.26938355){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\rotatebox{-18}{$P_\Gamma(T)$}\end{tabular}}}}%
     \put(0.42061857,0.14608533){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$T'$\end{tabular}}}}%
     \put(0.82120015,0.33766122){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$T$\end{tabular}}}}%
-    \put(0.50186546,0.34132003){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\rotatebox{-25}{$\textcolor{Green}{S}$}\end{tabular}}}}%
-    \put(0.57167646,0.45032477){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$C_S$\end{tabular}}}}%
+    \put(0.50186546,0.34132003){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\rotatebox{-25}{$S$}\end{tabular}}}}%
+    \put(0.57167646,0.45032477){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\rotatebox{-25}{$C_S$}\end{tabular}}}}%
     \put(0.69798491,0.22722736){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vect x_0$\end{tabular}}}}%
     \put(0.1248293,0.56274475){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\rotatebox{-25}{$\lPlane$}\end{tabular}}}}%
   \end{picture}%
