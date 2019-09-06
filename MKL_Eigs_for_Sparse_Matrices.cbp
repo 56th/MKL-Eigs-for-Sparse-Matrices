@@ -34,6 +34,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
+					<Add directory="/home/alexander/intel/compilers_and_libraries_2019.1.144/linux/mkl/include"/>
 					<Add directory="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/../Singleton-Logger/sln/Sources"/>
 				</Compiler>
 				<MakeCommands>
@@ -50,6 +51,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
+					<Add directory="/home/alexander/intel/compilers_and_libraries_2019.1.144/linux/mkl/include"/>
 					<Add directory="/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/../Singleton-Logger/sln/Sources"/>
 				</Compiler>
 				<MakeCommands>
