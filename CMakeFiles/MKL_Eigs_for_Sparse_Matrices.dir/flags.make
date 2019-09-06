@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -DNDEBUG   -std=gnu++14
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/../Singleton-Logger/sln/Sources 
+CXX_INCLUDES = -I/home/alexander/intel/compilers_and_libraries_2019.1.144/linux/mkl/include -I/home/alexander/Documents/MKL-Eigs-for-Sparse-Matrices/../Singleton-Logger/sln/Sources 
 

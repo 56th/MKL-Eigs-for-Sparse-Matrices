@@ -11,6 +11,7 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "/home/alexander/intel/compilers_and_libraries_2019.1.144/linux/mkl/include"
   "../Singleton-Logger/sln/Sources"
   )
 
