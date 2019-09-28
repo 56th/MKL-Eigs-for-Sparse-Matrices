@@ -72,6 +72,8 @@
 \newcommand{\LTwoSpace}[1][\Gamma]{{\mathbb L^2\left({#1}\right)}}
 \newcommand{\HOneSpace}[1][\Gamma]{{\mathbb H^1\left({#1}\right)}}
 
+\newcommand{\AZ}[1]{{\color{red}\textbf{AZ}:~#1}}
+
 \usepackage{listings}
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \lstset{
@@ -102,6 +104,78 @@
 \clearpage
 \let\oldtabular\tabular
 \renewcommand{\tabular}[1][1.5]{\def\arraystretch{#1}\oldtabular}
+
+\section{Navier--Stokes problem on the evolving surface}
+
+\subsection{Continuous problem and operator splitting}
+
+We consider surface Navier--Stokes equations for inextensible viscous material surface~$\Gamma = \Gamma(t)$
+\begin{align}\begin{split}\label{surfaceNS}
+	\rho\,D\vect u - 2\,\mu\Div_\Gamma(E_s(\vect u)) + \nabla_\Gamma p - p\,\kappa\,\vect n &= \vect f,\\
+	\Div_\Gamma \vect u &= -g, 
+\end{split}\end{align}
+cf.~\cite[p.~8]{Jankuhn_2018}. Performing operator splitting technique, one may rewrite system~\eqref{surfaceNS} as two systems: One for the normal, and another one for the tangential component of the velocity field $\vect u = \vect u_T + u_N\,\vect n$. Namely,
+\begin{align}\begin{split}\label{split:tang}
+	\rho\,\vect P D\vect u_T - 2\,\mu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + \nabla_\Gamma p + \rho\,u_N\,\vect H\,\vect u_T &= \vect f_T + \vect P \Div_\Gamma(u_N\,\vect H) + \rho\,u_N\,\nabla_\Gamma u_N,\\
+	\Div_\Gamma \vect u_T &= -g - u_N\,\kappa
+\end{split}\end{align}
+and 
+\begin{equation}\label{split:norm}
+	\rho\,D u_N = 2\,\mu\,\vect n\cdot\Div_\Gamma(E_s(\vect u)) + p\,\kappa + f_N + \rho\,D \vect n\cdot\vect u_T. 	
+\end{equation}
+Note that systems~\eqref{split:tang} and~\eqref{split:norm} are coupled. \AZ{TODO: rewrite~\eqref{split:norm} similar to~\eqref{split:tang}, i.e. in such a form so that the left-hand side \textbf{only} has terms dependent on~$u_N$, and all the rest goes to the right-hand side.}
+
+The normal component of the velocity defines surface dynamics. Thus the level-set function~$\phi$ satisfies the transport equation
+\begin{equation}\label{split:ls}
+	D \phi \coloneqq \frac{\partial \phi}{\partial t} + u_N\,\vect n\cdot\nabla\phi = 0.
+\end{equation} 
+
+\subsection{Tangential equation approximation}
+
+Our numerical scheme will be based on the operator splitting introduced above. For the time being, let us assume that the surface dynamics is defined: $\phi$ is given, and then from~\eqref{split:ls} we have $u_N = -\frac{\partial \phi}{\partial t}\,/\,\|\nabla \phi\|$. Then we rewrite~\eqref{split:tang} as
+\begin{align}\begin{split}\label{split:tang2}
+	\rho\,\left(\frac{\partial\vect u_T}{\partial t} + \vect P\,(\vect u\cdot\nabla)\vect u_T\right) - 2\,\mu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + \nabla_\Gamma p + \rho\,u_N\,\vect H\,\vect u_T &= \vect f_T,\\
+	\Div_\Gamma \vect u_T &= -g,
+\end{split}\end{align}
+where for the sake of simplicity we kept the same notation for the given right-hand side data (i.e. we set~$g \leftarrow g + u_N\,\kappa$ and similar for~$\vect f_T$).
+
+We start with the time discretization. Consider the time frame~$t_i \coloneqq i\,\Delta t$. Approximating the time derivative with some finite difference and linearizing the convective term via extrapolation of the wind field from previous time frames $t_{j<i}$, we arrive at the following Oseen-type problem posed on the stationary surface~$\Gamma(t_i)$: Find~$(\vect u_T^i,\,p^i)$ such that
+\begin{align}\begin{split}\label{split:tang:oseen}
+	\alpha\,\vect u_T^i + \vect P\,(\vect w\cdot\nabla)\vect u_T^i - 2\,\mu\,\vect P\Div_\Gamma(E_s(\vect u_T^i)) + \nabla_\Gamma p^i + \beta\,\vect H\,\vect u_T^i &= \hat{\vect f}_T,\\
+	\Div_\Gamma \vect u_T^i &= -\hat g.
+\end{split}\end{align}
+\begin{itemize}
+	\item At the first time frame $i = 1$ we utilize backward Euler approximation for the time derivative and initial data $\vect u(\cdot, 0) = \vect u^0$ for the wind field~$\vect w$. Thus we have
+	\begin{equation*}
+		\alpha = \rho\,\Delta t^{-1},\quad
+		\vect w = \rho\,\vect u^0,\quad
+		\beta = \rho\,u_N^1,\quad
+		\hat{\vect f}_T = \vect f_T^1 + \Delta t^{-1}\,\vect u_T^0,\quad
+		\hat g = g^1.
+	\end{equation*}
+	\item At time frames $i > 1$ we utilize BDF2 approximation for the time derivative and linear extrapolation for the wind field~$\vect w$. Thus we have
+	\begin{equation*}
+		\alpha = \rho\,\frac 32\,\Delta t^{-1},\quad
+		\vect w = \rho\,(2\,\vect u^{i-1} - \vect u^{i-2}),\quad
+		\beta = \rho\,u_N^i,\quad
+		\hat{\vect f}_T = \vect f_T^i + 2\,\Delta t^{-1}\,\vect u_T^{i-1} - \frac 12\,\Delta t^{-1}\,\vect u_T^{i-2},\quad
+		\hat g = g^i.
+		\end{equation*}
+	\end{itemize}
+This results in a semi-implicit time scheme.
+
+\subsection{Normal component approximation}
+
+TBA\dots
+
+\AZ{
+\begin{itemize}
+	\item Please check the scheme~\eqref{split:tang:oseen} and the choice of coefficients below the scheme. Let me know if you see any mistakes.
+	\item Right now I am cleaning the C++ code in DROPS. I already mentioned the issue with the assembly (i.e. all the matrices get assembled, even if they are never used). Another issue is that the test cases (initial conditions, levelsets, exact colutions etc.) are very inconvenient to read and add: They are hard-coded and take 350 lines of code in the main source file. One reason why it was implemented like this is simply because DROPS is old: It uses raw C-style function pointers for call-back functions. I actually fixed this issue today. Although it takes some time now, it will pay off: I want my test cases to be neat and clean, especially when it comes to implementing and verifying time-dependent problems. Hope this makes sense.  
+	\item Once I am done with implementing~\eqref{split:tang:oseen} (quite soon), I will test it on some smooth exact solution. Then I will test the Kelvin--Helmoltz problem on a torus. Here (\url{https://arxiv.org/pdf/1803.06893.pdf}, \url{https://arxiv.org/pdf/1909.06229.pdf}) Christoph uses ``smooth'' initial data. Is it essential? I was thinking about simply rotating the lower part of the torus, and keeping the upper part at rest (or moving it in the opposite direction), i.e. having ``jump'' discontinuity in the initial velocity. The moment equation is of parabolic type, so it shall smooth the solution anyway.
+	\item For the Kelvin--Helmoltz problem we want convection to dominate, but is our solver ready for this? Especially for not that small~$\Delta t$. Do not we need something like AL preconditioner here?    
+\end{itemize}
+}
 
 \section{Preliminaries}
 
