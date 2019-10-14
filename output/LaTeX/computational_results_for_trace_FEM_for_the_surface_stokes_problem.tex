@@ -70,6 +70,7 @@
 \newcommand{\HOne}{{\mathbb H^1}}
 \newcommand{\LTwo}{{\mathbb L^2}}
 \newcommand{\LTwoSpace}[1][\Gamma]{{\mathbb L^2\left({#1}\right)}}
+\newcommand{\LInfSpace}[1][\Gamma]{{\mathbb L^\infty\left({#1}\right)}}
 \newcommand{\HOneSpace}[1][\Gamma]{{\mathbb H^1\left({#1}\right)}}
 
 \newcommand{\AZ}[1]{{\color{red}\textbf{AZ}:~#1}}
@@ -90,7 +91,7 @@
 % https://tex.stackexchange.com/questions/9425/how-to-fix-footnote-position-at-the-bottom-of-the-page
 \usepackage[bottom]{footmisc}
 
-\title{Some computational results for $\vect{P}_1$\,--\,$P_1$ and $\vect{P}_2$\,--\,$P_1$ Trace\,FEM for the surface Stokes problem}
+\title{Some computational results for trace finite element method for the surface (Navier--)Stokes problem}
 \author{
 	Alexander Zhiliakov\thanks{Department of Mathematics, University of Houston, Houston, Texas 77204 (alex@math.uh.edu).}
 }
@@ -111,17 +112,19 @@
 
 We consider surface Navier--Stokes equations for inextensible viscous material surface~$\Gamma = \Gamma(t)$
 \begin{align}\begin{split}\label{surfaceNS}
-	\rho\,D\vect u - 2\,\mu\Div_\Gamma(E_s(\vect u)) + \nabla_\Gamma p - p\,\kappa\,\vect n &= \vect f,\\
+	D\vect u - \nu\Div_\Gamma(E_s(\vect u)) + \nabla_\Gamma p - p\,\kappa\,\vect n &= \vect f,\\
 	\Div_\Gamma \vect u &= -g, 
 \end{split}\end{align}
-cf.~\cite[p.~8]{Jankuhn_2018}. Performing operator splitting technique, one may rewrite system~\eqref{surfaceNS} as two systems: One for the normal, and another one for the tangential component of the velocity field $\vect u = \vect u_T + u_N\,\vect n$. Namely,
+cf.~\cite[p.~8]{Jankuhn_2018}. As standard in the analysis of the Navier--Stokes equations, we introduced dimensionless variables in~\eqref{surfaceNS} so that~$\|\vect u\|_{\LInfSpace} = 1$, with Reynolds number~$\nu^{-1}$. 
+
+Performing operator splitting technique, one may rewrite system~\eqref{surfaceNS} as two systems: One for the tangential, and another one for the normal component of the velocity field $\vect u = \vect u_T + u_N\,\vect n$. Namely,
 \begin{align}\begin{split}\label{split:tang}
-	\rho\,\vect P D\vect u_T - 2\,\mu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + \nabla_\Gamma p + \rho\,u_N\,\vect H\,\vect u_T &= \vect f_T + \vect P \Div_\Gamma(u_N\,\vect H) + \rho\,u_N\,\nabla_\Gamma u_N,\\
+	\vect P D\vect u_T - \nu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + u_N\,\vect H\,\vect u_T + \nabla_\Gamma p &= \vect f_T + \nu\,\vect P \Div_\Gamma(u_N\,\vect H) + u_N\,\nabla_\Gamma u_N,\\
 	\Div_\Gamma \vect u_T &= -g - u_N\,\kappa
 \end{split}\end{align}
 and 
 \begin{equation}\label{split:norm}
-	\rho\,D u_N = 2\,\mu\,\vect n\cdot\Div_\Gamma(E_s(\vect u)) + p\,\kappa + f_N + \rho\,D \vect n\cdot\vect u_T. 	
+	D u_N = \nu\,\vect n\cdot\Div_\Gamma(E_s(\vect u)) + p\,\kappa + f_N + D \vect n\cdot\vect u_T. 	
 \end{equation}
 Note that systems~\eqref{split:tang} and~\eqref{split:norm} are coupled. \AZ{TODO: rewrite~\eqref{split:norm} similar to~\eqref{split:tang}, i.e. in such a form so that the left-hand side \textbf{only} has terms dependent on~$u_N$, and all the rest goes to the right-hand side.}
 
@@ -130,34 +133,34 @@ The normal component of the velocity defines surface dynamics. Thus the level-se
 	D \phi \coloneqq \frac{\partial \phi}{\partial t} + u_N\,\vect n\cdot\nabla\phi = 0.
 \end{equation} 
 
-\subsection{Tangential equation approximation}
+\subsection{Tangential component approximation}
 
 Our numerical scheme will be based on the operator splitting introduced above. For the time being, let us assume that the surface dynamics is defined: $\phi$ is given, and then from~\eqref{split:ls} we have $u_N = -\frac{\partial \phi}{\partial t}\,/\,\|\nabla \phi\|$. Then we rewrite~\eqref{split:tang} as
 \begin{align}\begin{split}\label{split:tang2}
-	\rho\,\left(\frac{\partial\vect u_T}{\partial t} + \vect P\,(\vect u\cdot\nabla)\vect u_T\right) - 2\,\mu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + \nabla_\Gamma p + \rho\,u_N\,\vect H\,\vect u_T &= \vect f_T,\\
+	\frac{\partial\vect u_T}{\partial t} + \vect P\,(\vect u\cdot\nabla)\vect u_T - \nu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + u_N\,\vect H\,\vect u_T + \nabla_\Gamma p &= \vect f_T,\\
 	\Div_\Gamma \vect u_T &= -g,
 \end{split}\end{align}
 where for the sake of simplicity we kept the same notation for the given right-hand side data (i.e. we set~$g \leftarrow g + u_N\,\kappa$ and similar for~$\vect f_T$).
 
 We start with the time discretization. Consider the time frame~$t_i \coloneqq i\,\Delta t$. Approximating the time derivative with some finite difference and linearizing the convective term via extrapolation of the wind field from previous time frames $t_{j<i}$, we arrive at the following Oseen-type problem posed on the stationary surface~$\Gamma(t_i)$: Find~$(\vect u_T^i,\,p^i)$ such that
 \begin{align}\begin{split}\label{split:tang:oseen}
-	\alpha\,\vect u_T^i + \vect P\,(\vect w\cdot\nabla)\vect u_T^i - 2\,\mu\,\vect P\Div_\Gamma(E_s(\vect u_T^i)) + \nabla_\Gamma p^i + \beta\,\vect H\,\vect u_T^i &= \hat{\vect f}_T,\\
+	\alpha\,\vect u_T^i + \vect P\,(\vect w\cdot\nabla)\vect u_T^i - \nu\,\vect P\Div_\Gamma(E_s(\vect u_T^i)) + \beta\,\vect H\,\vect u_T^i + \nabla_\Gamma p^i &= \hat{\vect f}_T,\\
 	\Div_\Gamma \vect u_T^i &= -\hat g.
 \end{split}\end{align}
 \begin{itemize}
 	\item At the first time frame $i = 1$ we utilize backward Euler approximation for the time derivative and initial data $\vect u(\cdot, 0) = \vect u^0$ for the wind field~$\vect w$. Thus we have
 	\begin{equation*}
-		\alpha = \rho\,\Delta t^{-1},\quad
-		\vect w = \rho\,\vect u^0,\quad
-		\beta = \rho\,u_N^1,\quad
+		\alpha = \Delta t^{-1},\quad
+		\vect w = \vect u^0,\quad
+		\beta = u_N^1,\quad
 		\hat{\vect f}_T = \vect f_T^1 + \Delta t^{-1}\,\vect u_T^0,\quad
 		\hat g = g^1.
 	\end{equation*}
 	\item At time frames $i > 1$ we utilize BDF2 approximation for the time derivative and linear extrapolation for the wind field~$\vect w$. Thus we have
 	\begin{equation*}
-		\alpha = \rho\,\frac 32\,\Delta t^{-1},\quad
-		\vect w = \rho\,(2\,\vect u^{i-1} - \vect u^{i-2}),\quad
-		\beta = \rho\,u_N^i,\quad
+		\alpha = \frac 32\,\Delta t^{-1},\quad
+		\vect w = 2\,\vect u^{i-1} - \vect u^{i-2},\quad
+		\beta = u_N^i,\quad
 		\hat{\vect f}_T = \vect f_T^i + 2\,\Delta t^{-1}\,\vect u_T^{i-1} - \frac 12\,\Delta t^{-1}\,\vect u_T^{i-2},\quad
 		\hat g = g^i.
 		\end{equation*}
@@ -172,8 +175,8 @@ TBA\dots
 \begin{itemize}
 	\item Please check the scheme~\eqref{split:tang:oseen} and the choice of coefficients below the scheme. Let me know if you see any mistakes.
 	\item Right now I am cleaning the C++ code in DROPS. I already mentioned the issue with the assembly (i.e. all the matrices get assembled, even if they are never used). Another issue is that the test cases (initial conditions, levelsets, exact colutions etc.) are very inconvenient to read and add: They are hard-coded and take 350 lines of code in the main source file. One reason why it was implemented like this is simply because DROPS is old: It uses raw C-style function pointers for call-back functions. I actually fixed this issue today. Although it takes some time now, it will pay off: I want my test cases to be neat and clean, especially when it comes to implementing and verifying time-dependent problems. Hope this makes sense.  
-	\item Once I am done with implementing~\eqref{split:tang:oseen} (quite soon), I will test it on some smooth exact solution. Then I will test the Kelvin--Helmoltz problem on a torus. Here (\url{https://arxiv.org/pdf/1803.06893.pdf}, \url{https://arxiv.org/pdf/1909.06229.pdf}) Christoph uses ``smooth'' initial data. Is it essential? I was thinking about simply rotating the lower part of the torus, and keeping the upper part at rest (or moving it in the opposite direction), i.e. having ``jump'' discontinuity in the initial velocity. The moment equation is of parabolic type, so it shall smooth the solution anyway.
-	\item For the Kelvin--Helmoltz problem we want convection to dominate, but is our solver ready for this? Especially for not that small~$\Delta t$. Do not we need something like AL preconditioner here?    
+	\item Once I am done with implementing~\eqref{split:tang:oseen} (quite soon), I will test it on some smooth exact solution. Then I will test the Kelvin--Helmholtz problem on a torus. Here (\url{https://arxiv.org/pdf/1803.06893.pdf}, \url{https://arxiv.org/pdf/1909.06229.pdf}) Christoph uses ``smooth'' initial data. Is it essential? I was thinking about simply rotating the lower part of the torus, and keeping the upper part at rest (or moving it in the opposite direction), i.e. having ``jump'' discontinuity in the initial velocity. The moment equation is of parabolic type, so it shall smooth the solution anyway.
+	\item For the Kelvin--Helmholtz problem we want convection to dominate, but is our solver ready for this? Especially for not that small~$\Delta t$. Do not we need something like AL preconditioner here?    
 \end{itemize}
 }
 
@@ -1480,116 +1483,58 @@ for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$
 \end{table}
 \addtocounter{table}{-1}
 
-%\clearpage
-%\vfill
-%\begin{table}[h]
-%	\centering\small
-%	\caption{Spectrum of~\eqref{problem} for $\vect P_2$\,--\,$P_1$} 
-%	\label{tab:p2p1}
-%	\begin{subtable}{1.\linewidth}
-%		\centering
-%		\caption{$\Gamma = \sphere$}
-%		\label{tab:p2p1:sph}
-%		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
-%			\hline
-%			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%			\cline{4-9}
-%			& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-%			\hline
-%			\input{sphere_2_P2P1_table.tex}
-%		\end{tabular}
-%	\end{subtable}%
-%	\vskip 3mm
-%	\begin{subtable}{1.\linewidth}
-%		\centering
-%		\caption{$\Gamma = \tor$}
-%		\label{tab:p2p1:tor}
-%		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|c|c|}
-%			\hline
-%			\multirow{2}{*}{$h$} & \multirow{2}{*}{$n_{\vect A}$} & \multirow{2}{*}{$n_{\vect S}$} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%			\cline{4-9}
-%			& & & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-%			\hline
-%			\input{torus_P2P1_table.tex}
-%		\end{tabular}
-%	\end{subtable}
-%\end{table}
-%\vfill
-%\begin{figure}[h]
-%	\centering\small
-%	\begin{subfigure}{.49\linewidth}
-%		\centering
-%		\includegraphicsw{sphere_2_P2P1.png}
-%	\end{subfigure}%
-%	\hfill
-%	\begin{subfigure}{.49\linewidth}
-%		\centering
-%		\includegraphicsw{torus_P2P1.png}
-%	\end{subfigure}
-%	\caption{Log-log plot of~$\lambda_2$ for Tables~\ref{tab:p2p1}\subref{tab:p2p1:sph} (left) and~\ref{tab:p2p1}\subref{tab:p2p1:tor} (right)}
-%\end{figure}
-%\vfill
-%\clearpage
-%\subsection{Sensitivity of the spectrum to levelset shifts}
-%
-%In this section we investigate the sensitivity of the spectrum to levelset shifts
-%\begin{equation}\label{shift}
-%\Gamma \mapsto \Gamma + \alpha\,\vect s,
-%\end{equation}
-%for some $\alpha \in \mathbb R$ and $\vect s \in \mathbb R^3$, $\|\vect s\| = 1$. 
-%
-%We construct the bulk mesh~$\Omega_h^\Gamma$ and then perform the assembly of matrices~\eqref{mtx} using the shifted levelset~\eqref{shift}. That is, the refinement of~$\Omega_h^\Gamma$ is performed using~$\Gamma$, not~$\Gamma + \alpha\,\vect s$, and~$\Omega_h^{\Gamma + \alpha\,\vect s}$ is never constructed. We choose $\alpha \in [0, h]$ to guarantee the appearance of ``small cuts'' in~$\Omega_h^\Gamma$.
-%
-%\begin{figure}[h]
-%	\centering
-%	\begin{subfigure}{.5\linewidth}
-%		\centering
-%		\includegraphicsw[.7]{{shift_0.0.cropped}.png}
-%		\caption{$\sphere$}
-%	\end{subfigure}%
-%	\begin{subfigure}{.5\linewidth}
-%		\centering
-%		\includegraphicsw[.7]{{shift_0.2.cropped}.png}
-%		\caption{$\sphere + \alpha\,\vect s$}
-%	\end{subfigure}%
-%	\caption{The unit sphere (left) and the shifted unit sphere (right). Here $\vect s = (0, 1, 1)^T/\sqrt{2}$, $\alpha = 0.2$, and $h = 2.08\times10^{-1}$. The bulk mesh~$\Omega_h^\Gamma$ is computed for~$\sphere$ and then used for~$\sphere + \alpha\,\vect s$}
-%	\label{fig:shift}		
-%\end{figure}
-%
-%\begin{table}[h]
-%	\centering
-%	\caption{Spectrum of~\eqref{problem} for perturbed levelset $\sphere + \alpha\,\vect s$. Here $\vect s = (1, 1, 1)^T/\sqrt{3}$, $h = 1.04\times10^{-1}$} 
-%	\label{tab:p1p1_shift_h=0.104167}
-%	\small
-%	\begin{subtable}{1.\linewidth}
-%		\centering
-%		\caption{$\vect P_1$\,--\,$P_1$}
-%		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|}
-%			\hline
-%			\multirow{2}{*}{Surface} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%			\cline{2-7}
-%			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-%			\hline
-%			\input{sphere_2_P1P1_h=0.104167_table.tex}
-%		\end{tabular}
-%	\end{subtable}
-%	\vskip 4mm
-%	\begin{subtable}{1.\linewidth}
-%		\centering
-%		\caption{$\vect P_2$\,--\,$P_1$}
-%		\begin{tabular}[1.3]{|c|c|c|c|c|c|c|}
-%			\hline
-%			\multirow{2}{*}{Surface} & \multicolumn{2}{c|}{$\vect S_0$} & \multicolumn{2}{c|}{$\vect S_n$} & \multicolumn{2}{c|}{$\vect S_{\text{full}}$} \\ 
-%			\cline{2-7}
-%			& $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ & $\lambda_2$ & $\lambda_{n_{\vect S}}$ \\ 
-%			\hline
-%			\input{sphere_2_P2P1_h=0.104167_table.tex}
-%		\end{tabular}%
-%	\end{subtable}
-%\end{table}
+\section{Notes on DROPS implementation}
 
-%\section{Notes on DROPS implementation}
-%
+\subsection{VTK output}
+
+DROPS \href{https://git.rwth-aachen.de/DROPS/drops/blob/uh/src/out/vtkOut.cpp}{implements} its own routines for writing *.vtu files (for Paraview or Visit to read). What I noticed is that they take a lot of space for finer mesh levels, even if one uses binary output format. This is a bottleneck when one wants to generate the output for transient problems.
+
+What I did is, I implemented another class for writing *.vtu files, cf. \href{https://git.rwth-aachen.de/DROPS/drops/blob/uh/src/surfnavierstokes/VTKWriter.hpp}{here}. The difference from the old implementation is that this new class utilizes the official \href{https://gitlab.kitware.com/vtk/vtk}{VTK library}, i.e. it does not implement writing of *.vtu from scratch.
+
+The two implementations are compared via exporting the following data: Mesh nodes (including middle points of edges) and element connectivity, level-set scalar field~$I_h(\phi)$, 2 pressure scalar fields $I_h(p)$ and $p_h$, and 2 vector fields $I_h(\vect u)$ and $\vect u_h$.
+
+\begin{table}[H]
+	\centering
+	\caption{ASCII output} \label{tab:vtk:ascii}
+	\footnotesize
+	\begin{tabular}[1.2]{|c|c|c|c|c|}
+		\hline
+		\multirow{2}{*}{$h$} & \multicolumn{2}{c|}{CPU time, seconds} & \multicolumn{2}{c|}{Size of *.vtu} \\ 
+		\cline{2-5}
+		& Old implementation & New implementation & Old implementation & New implementation \\ 
+		\hline
+		$2.08\times	10^{-1}$ & 0.123 & 0.0874 & 1.3\,M & 2.3\,M \\
+		\hline
+		$1.04\times	10^{-1}$ & 0.314 & 0.158 & 4.9\,M & 8.8\,M \\
+		\hline
+		$5.21\times	10^{-2}$ & 1.189 & 0.495 & 21\,M & 37\,M \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\caption{Binary output} \label{tab:vtk:bin}
+	\footnotesize
+	\begin{tabular}[1.2]{|c|c|c|c|c|}
+		\hline
+		\multirow{2}{*}{$h$} & \multicolumn{2}{c|}{CPU time, seconds} & \multicolumn{2}{c|}{Size of *.vtu} \\ 
+		\cline{2-5}
+		& Old implementation & New implementation & Old implementation & New implementation \\ 
+		\hline
+		$2.08\times	10^{-1}$ & 0.0919 & 0.107 & 1.1\,M & 540\,K \\
+		\hline
+		$1.04\times	10^{-1}$ & 0.202 & 0.219 & 4.2\,M & 2.2\,M \\
+		\hline
+		$5.21\times	10^{-2}$ & 0.755 & 0.781 & 19\,M & 9\,M \\
+		\hline
+	\end{tabular}
+\end{table}
+
+From Table~\ref{tab:vtk:bin} we see that the CPU time for both implementations are comparable, and the new implementation is twice as efficient in terms of the space usage. Which is nice.
+
+Note: From Table~\ref{tab:vtk:ascii} we see that the new implementation produces twice as large files in ASCII format. This is simply because we write the fields in double precision, and the old implementation writes numbers in single precision (i.e. each text representation of a number is 16 characters against 8). Anyway, this does not matter, for in practice we are using binary format.
+
 %\subsection{Notations}\label{subsec:not}
 %
 %We denote by~$P_h^n \subset \bar P_h^n$ spaces of continuous and discontinuous nodal~$P_n$ interpolants defined on~$\Omega_h^\Gamma$, respectively. For a function~$f$, $I_h^n(f) \in P_h^n$ is the corresponding interpolant; we will use the notation~$f_h^n$ to emphasize that~$f_h^n \in P_h^n$ and~$f_h^n$ approximates~$f$ in some sense, but~$I_h^n(f) \ne f_h^n$.
