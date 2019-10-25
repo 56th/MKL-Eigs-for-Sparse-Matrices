@@ -22,6 +22,7 @@
 {}% formatting commands applied just to subsection title
 [.]% punctuation or other commands following subsection title
 \titleformat{\subsubsection}[runin]{\normalfont\bfseries}{\thesubsubsection}{0.5em}{}[.]
+\titleformat{\paragraph}[runin]{\normalfont\bfseries}{\thesubsubsection}{0.5em}{}[.]
 
 % links
 \usepackage{hyperref}
@@ -63,6 +64,7 @@
 \newcommand*\Diff[1]{\mathop{}\!\mathrm{d^#1}}
 
 \DeclareMathOperator{\Div}{div}
+\DeclareMathOperator{\Tr}{tr}
 \DeclareMathOperator{\Dist}{dist}
 \newcommand{\sphere}{{\Gamma_{\text{sph}}}}
 \newcommand{\tor}{{\Gamma_{\text{tor}}}}
@@ -91,7 +93,7 @@
 % https://tex.stackexchange.com/questions/9425/how-to-fix-footnote-position-at-the-bottom-of-the-page
 \usepackage[bottom]{footmisc}
 
-\title{Some computational results for trace finite element method for the surface (Navier--)Stokes problem}
+\title{Trace finite element method for the surface (Navier--)Stokes problem}
 \author{
 	Alexander Zhiliakov\thanks{Department of Mathematics, University of Houston, Houston, Texas 77204 (alex@math.uh.edu).}
 }
@@ -112,73 +114,94 @@
 
 We consider surface Navier--Stokes equations for inextensible viscous material surface~$\Gamma = \Gamma(t)$
 \begin{align}\begin{split}\label{surfaceNS}
-	D\vect u - \nu\Div_\Gamma(E_s(\vect u)) + \nabla_\Gamma p - p\,\kappa\,\vect n &= \vect f,\\
-	\Div_\Gamma \vect u &= -g, 
+	\frac{\mbox d\vect u}{\mbox d t} - \nu\Div_\Gamma(E_s(\vect u)) + \nabla_\Gamma p - p\,\kappa\,\vect n &= \vect f,\\
+	\Div_\Gamma \vect u &= g
 \end{split}\end{align}
-cf.~\cite[p.~8]{Jankuhn_2018}. As standard in the analysis of the Navier--Stokes equations, we introduced dimensionless variables in~\eqref{surfaceNS} so that~$\|\vect u\|_{\LInfSpace} = 1$, with Reynolds number~$\nu^{-1}$. 
+with $\mbox d / \mbox d t$ denoting material (full) derivative operator, cf.~\cite[p.~8]{Jankuhn_2018}. As standard in the analysis of the Navier--Stokes equations, we introduced dimensionless variables in~\eqref{surfaceNS} so that~$\|\vect u\|_{\LInfSpace} = 1$, with Reynolds number~$\nu^{-1}$. 
 
 Performing operator splitting technique, one may rewrite system~\eqref{surfaceNS} as two systems: One for the tangential, and another one for the normal component of the velocity field $\vect u = \vect u_T + u_N\,\vect n$. Namely,
 \begin{align}\begin{split}\label{split:tang}
-	\vect P D\vect u_T - \nu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + u_N\,\vect H\,\vect u_T + \nabla_\Gamma p &= \vect f_T + \nu\,\vect P \Div_\Gamma(u_N\,\vect H) + u_N\,\nabla_\Gamma u_N,\\
-	\Div_\Gamma \vect u_T &= -g - u_N\,\kappa
+	\vect P \frac{\mbox d\vect u_T}{\mbox d t} - \nu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + u_N\,\vect H\,\vect u_T + \nabla_\Gamma p &= \vect f_T + \nu\,\vect P \Div_\Gamma(u_N\,\vect H) + u_N\,\nabla_\Gamma u_N,\\
+	\Div_\Gamma \vect u_T &= g - u_N\,\kappa
 \end{split}\end{align}
 and 
 \begin{equation}\label{split:norm}
-	D u_N = \nu\,\vect n\cdot\Div_\Gamma(E_s(\vect u)) + p\,\kappa + f_N + D \vect n\cdot\vect u_T. 	
+	\frac{\mbox d u_N}{\mbox d t} = \nu\,\vect n\cdot\Div_\Gamma(E_s(\vect u)) + p\,\kappa + f_N + D \vect n\cdot\vect u_T. 	
 \end{equation}
-Note that systems~\eqref{split:tang} and~\eqref{split:norm} are coupled. \AZ{TODO: rewrite~\eqref{split:norm} similar to~\eqref{split:tang}, i.e. in such a form so that the left-hand side \textbf{only} has terms dependent on~$u_N$, and all the rest goes to the right-hand side.}
+Note that systems~\eqref{split:tang} and~\eqref{split:norm} are coupled. \AZ{TODO: Rewrite~\eqref{split:norm} similar to~\eqref{split:tang}, i.e. in such a form so that the left-hand side \textbf{only} has terms dependent on~$u_N$, and all the rest goes to the right-hand side.}
 
 The normal component of the velocity defines surface dynamics. Thus the level-set function~$\phi$ satisfies the transport equation
 \begin{equation}\label{split:ls}
-	D \phi \coloneqq \frac{\partial \phi}{\partial t} + u_N\,\vect n\cdot\nabla\phi = 0.
+	\frac{\mbox d\phi}{\mbox d t} \coloneqq \frac{\partial \phi}{\partial t} + u_N\,\vect n\cdot\nabla\phi = 0.
 \end{equation} 
 
-\subsection{Tangential component approximation}
+\subsection{Tangential component equation}
 
 Our numerical scheme will be based on the operator splitting introduced above. For the time being, let us assume that the surface dynamics is defined: $\phi$ is given, and then from~\eqref{split:ls} we have $u_N = -\frac{\partial \phi}{\partial t}\,/\,\|\nabla \phi\|$. Then we rewrite~\eqref{split:tang} as
 \begin{align}\begin{split}\label{split:tang2}
 	\frac{\partial\vect u_T}{\partial t} + \vect P\,(\vect u\cdot\nabla)\vect u_T - \nu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + u_N\,\vect H\,\vect u_T + \nabla_\Gamma p &= \vect f_T,\\
-	\Div_\Gamma \vect u_T &= -g,
+	\Div_\Gamma \vect u_T &= g,
 \end{split}\end{align}
-where for the sake of simplicity we kept the same notation for the given right-hand side data (i.e. we set~$g \leftarrow g + u_N\,\kappa$ and similar for~$\vect f_T$).
+where for the sake of simplicity we kept the same notation for the given right-hand side data (i.e. we set~$g \stackrel{\eqref{split:tang}}{\coloneqq} g - u_N\,\kappa$ and similar for~$\vect f_T$).
 
-We start with the time discretization. Consider the time frame~$t_i \coloneqq i\,\Delta t$. Approximating the time derivative with some finite difference and linearizing the convective term via extrapolation of the wind field from previous time frames $t_{j<i}$, we arrive at the following Oseen-type problem posed on the stationary surface~$\Gamma(t_i)$: Find~$(\vect u_T^i,\,p^i)$ such that
+\subsubsection{Discretization}
+
+We start with the time discretization. Consider the time frame~$t_i \coloneqq i\,\Delta t$. Approximating the time derivative with some finite difference and linearizing the convective term via extrapolation of the wind field from previous time frames $t_{j<i}$, we arrive at the following Oseen-type problem posed on the stationary surface~$\Gamma(t_i)$: Find~$(\vect u_T,\,p)$ such that
 \begin{align}\begin{split}\label{split:tang:oseen}
-	\alpha\,\vect u_T^i + \vect P\,(\vect w\cdot\nabla)\vect u_T^i - \nu\,\vect P\Div_\Gamma(E_s(\vect u_T^i)) + \beta\,\vect H\,\vect u_T^i + \nabla_\Gamma p^i &= \hat{\vect f}_T,\\
-	\Div_\Gamma \vect u_T^i &= -\hat g.
+	\alpha\,\vect u_T + \vect P\,(\vect w\cdot\nabla)\vect u_T - \nu\,\vect P\Div_\Gamma(E_s(\vect u_T)) + \beta\,\vect H\,\vect u_T + \nabla_\Gamma p &= \vect f_T,\\
+	\Div_\Gamma \vect u_T &= g
 \end{split}\end{align}
+with $g \stackrel{\eqref{split:tang2}}{\coloneqq} g(\cdot, t_i)$ and $\beta \stackrel{\eqref{split:tang2}}{\coloneqq} u_N(\cdot, t_i)$. The solution~$(\vect u_T,\,p)$ of~\eqref{split:tang:oseen} approximates the solution of~\eqref{split:tang2} at time~$t = t_i$.
 \begin{itemize}
-	\item At the first time frame $i = 1$ we utilize backward Euler approximation for the time derivative and initial data $\vect u(\cdot, 0) = \vect u^0$ for the wind field~$\vect w$. Thus we have
+	\item At the first time frame $i = 1$ we utilize backward Euler approximation for the time derivative and initial data $\vect u^0 \coloneqq \vect u(\cdot, 0)$ for the wind field~$\vect w$. Thus we have
 	\begin{equation*}
-		\alpha = \Delta t^{-1},\quad
-		\vect w = \vect u^0,\quad
-		\beta = u_N^1,\quad
-		\hat{\vect f}_T = \vect f_T^1 + \Delta t^{-1}\,\vect u_T^0,\quad
-		\hat g = g^1.
+		\alpha \coloneqq \Delta t^{-1},\quad
+		\vect w \coloneqq \vect u^0,\quad
+		\vect f_T \coloneqq \vect f_T^i + \Delta t^{-1}\,\vect u_T^0,
 	\end{equation*}
-	\item At time frames $i > 1$ we utilize BDF2 approximation for the time derivative and linear extrapolation for the wind field~$\vect w$. Thus we have
+	\item At time frames $i > 1$ we utilize BDF2 approximation for the time derivative and linear extrapolation for the wind field~$\vect w$. Denoting the (approximate) velocity solution at time~$t = t_j$ by~$\vect u^j$, we have
 	\begin{equation*}
-		\alpha = \frac 32\,\Delta t^{-1},\quad
-		\vect w = 2\,\vect u^{i-1} - \vect u^{i-2},\quad
-		\beta = u_N^i,\quad
-		\hat{\vect f}_T = \vect f_T^i + 2\,\Delta t^{-1}\,\vect u_T^{i-1} - \frac 12\,\Delta t^{-1}\,\vect u_T^{i-2},\quad
-		\hat g = g^i.
+		\alpha \coloneqq \frac 32\,\Delta t^{-1},\quad
+		\vect w \coloneqq 2\,\vect u^{i-1} - \vect u^{i-2},\quad
+		\vect f_T \coloneqq \vect f_T^i + 2\,\Delta t^{-1}\,\vect u_T^{i-1} - \frac 12\,\Delta t^{-1}\,\vect u_T^{i-2},
 		\end{equation*}
 	\end{itemize}
 This results in a semi-implicit time scheme.
 
-\subsection{Normal component approximation}
+Next we consider the weak formulation for~\eqref{split:tang:oseen}: Find~$(\vect u_T, p) \in \vect V_T \times Q$ s.t.
+\begin{align}\begin{split}\label{split:tang:oseen:weak}
+	a(\vect u_T, \vect v_T) + b_T(\vect v_T, q) &= (\vect f_T, \vect v_T), \\
+	-b_T(\vect u_T, q) &= (g, q)
+\end{split}\end{align}
+holds for all~$(\vect v_T, q) \in \vect V_T \times Q$. \AZ{TODO: Add definitions of forms and spaces.} In order to deal with the dominating convection case, $\nu \ll 1$, we regularize~\eqref{split:tang:oseen:weak} via introducing augmented Lagrangian\,/\,grad-div type stabilization~\cite{benzi2006augmented}. Choosing test function~$q = \Div_\Gamma\vect v_T = \Tr E_s(\vect v_T)$ in the second equation of~\eqref{split:tang:oseen:weak} and adding it to the first one, we end up with
+$$
+	\underbrace{a(\vect u_T, \vect v_T) + \gamma\,\big(\Tr E_s(\vect u_T), \Tr E_s(\vect v_T)\big)}_{a_\gamma(\vect u_T, \vect v_T) \coloneqq} + b(\vect v_T, q) = (\vect f_T, \vect v_T) + \gamma\,(g, \Tr E_s(\vect v_T)) \eqqcolon (\vect f_\gamma, \vect v_T),
+$$
+where we introduced an augmented bilinear form~$a_\gamma(\cdot, \cdot)$ and linear functional~$(\vect f_\gamma,\cdot)$ with a regularization parameter $\gamma \ge 0$. Thus our regularized weak problem reads as
+\begin{align}\begin{split}\label{split:tang:oseen:weak:reg}
+	a_\gamma(\vect u_T, \vect v_T) + b_T(\vect v_T, q) &= (\vect f_\gamma, \vect v_T), \\
+	-b_T(\vect u_T, q) &= (g, q).
+\end{split}\end{align}
+Note that~\eqref{split:tang:oseen:weak:reg} is consistent with~\eqref{split:tang:oseen:weak} in the sense that they have the same solution.
+
+\subsubsection{Numerical experiments}
+
+\paragraph{Algebraic solver robustness}
+
+\paragraph{Kelvin--Helmholtz instability simulation}
+
+\subsection{Normal component equation}
 
 TBA\dots
 
-\AZ{
-\begin{itemize}
-	\item Please check the scheme~\eqref{split:tang:oseen} and the choice of coefficients below the scheme. Let me know if you see any mistakes.
-	\item Right now I am cleaning the C++ code in DROPS. I already mentioned the issue with the assembly (i.e. all the matrices get assembled, even if they are never used). Another issue is that the test cases (initial conditions, levelsets, exact colutions etc.) are very inconvenient to read and add: They are hard-coded and take 350 lines of code in the main source file. One reason why it was implemented like this is simply because DROPS is old: It uses raw C-style function pointers for call-back functions. I actually fixed this issue today. Although it takes some time now, it will pay off: I want my test cases to be neat and clean, especially when it comes to implementing and verifying time-dependent problems. Hope this makes sense.  
-	\item Once I am done with implementing~\eqref{split:tang:oseen} (quite soon), I will test it on some smooth exact solution. Then I will test the Kelvin--Helmholtz problem on a torus. Here (\url{https://arxiv.org/pdf/1803.06893.pdf}, \url{https://arxiv.org/pdf/1909.06229.pdf}) Christoph uses ``smooth'' initial data. Is it essential? I was thinking about simply rotating the lower part of the torus, and keeping the upper part at rest (or moving it in the opposite direction), i.e. having ``jump'' discontinuity in the initial velocity. The moment equation is of parabolic type, so it shall smooth the solution anyway.
-	\item For the Kelvin--Helmholtz problem we want convection to dominate, but is our solver ready for this? Especially for not that small~$\Delta t$. Do not we need something like AL preconditioner here?    
-\end{itemize}
-}
+%\AZ{
+%\begin{itemize}
+%	\item Please check the scheme~\eqref{split:tang:oseen} and the choice of coefficients below the scheme. Let me know if you see any mistakes.
+%	\item Right now I am cleaning the C++ code in DROPS. I already mentioned the issue with the assembly (i.e. all the matrices get assembled, even if they are never used). Another issue is that the test cases (initial conditions, levelsets, exact colutions etc.) are very inconvenient to read and add: They are hard-coded and take 350 lines of code in the main source file. One reason why it was implemented like this is simply because DROPS is old: It uses raw C-style function pointers for call-back functions. I actually fixed this issue today. Although it takes some time now, it will pay off: I want my test cases to be neat and clean, especially when it comes to implementing and verifying time-dependent problems. Hope this makes sense.  
+%	\item Once I am done with implementing~\eqref{split:tang:oseen} (quite soon), I will test it on some smooth exact solution. Then I will test the Kelvin--Helmholtz problem on a torus. Here (\url{https://arxiv.org/pdf/1803.06893.pdf}, \url{https://arxiv.org/pdf/1909.06229.pdf}) Christoph uses ``smooth'' initial data. Is it essential? I was thinking about simply rotating the lower part of the torus, and keeping the upper part at rest (or moving it in the opposite direction), i.e. having ``jump'' discontinuity in the initial velocity. The moment equation is of parabolic type, so it shall smooth the solution anyway.
+%	\item For the Kelvin--Helmholtz problem we want convection to dominate, but is our solver ready for this? Especially for not that small~$\Delta t$. Do not we need something like AL preconditioner here?    
+%\end{itemize}
+%}
 
 \section{Preliminaries}
 
