@@ -128,7 +128,7 @@ and
 \begin{equation}\label{split:norm}
 	\frac{\mbox d u_N}{\mbox d t} = \nu\,\vect n\cdot\Div_\Gamma(E_s(\vect u)) + p\,\kappa + f_N + D \vect n\cdot\vect u_T. 	
 \end{equation}
-Note that systems~\eqref{split:tang} and~\eqref{split:norm} are coupled. \AZ{TODO: Rewrite~\eqref{split:norm} similar to~\eqref{split:tang}, i.e. in such a form so that the left-hand side \textbf{only} has terms dependent on~$u_N$, and all the rest goes to the right-hand side.}
+Note that systems~\eqref{split:tang} and~\eqref{split:norm} are coupled. \AZ{Rewrite~\eqref{split:norm} similar to~\eqref{split:tang}, i.e. in such a form so that the left-hand side \textbf{only} has terms dependent on~$u_N$, and all the rest goes to the right-hand side.}
 
 The normal component of the velocity defines surface dynamics. Thus the level-set function~$\phi$ satisfies the transport equation
 \begin{equation}\label{split:ls}
@@ -173,16 +173,61 @@ Next we consider the weak formulation for~\eqref{split:tang:oseen}: Find~$(\vect
 	a(\vect u_T, \vect v_T) + b_T(\vect v_T, q) &= (\vect f_T, \vect v_T), \\
 	-b_T(\vect u_T, q) &= (g, q)
 \end{split}\end{align}
-holds for all~$(\vect v_T, q) \in \vect V_T \times Q$. \AZ{TODO: Add definitions of forms and spaces.} In order to deal with the dominating convection case, $\nu \ll 1$, we regularize~\eqref{split:tang:oseen:weak} via introducing augmented Lagrangian\,/\,grad-div type stabilization~\cite{benzi2006augmented}. Choosing test function~$q = \Div_\Gamma\vect v_T = \Tr E_s(\vect v_T)$ in the second equation of~\eqref{split:tang:oseen:weak} and adding it to the first one, we end up with
+holds for all~$(\vect v_T, q) \in \vect V_T \times Q$. \AZ{Add definitions of forms and spaces.} In order to deal with the dominating convection case, $\nu \ll 1$, we regularize~\eqref{split:tang:oseen:weak} via introducing augmented Lagrangian\,/\,grad-div type stabilization~\cite{benzi2006augmented}. Choosing test function~$q = \Div_\Gamma\vect v_T = \Tr E_s(\vect v_T)$ in the second equation of~\eqref{split:tang:oseen:weak} and adding it to the first one, we end up with
 $$
 	\underbrace{a(\vect u_T, \vect v_T) + \gamma\,\big(\Tr E_s(\vect u_T), \Tr E_s(\vect v_T)\big)}_{a_\gamma(\vect u_T, \vect v_T) \coloneqq} + b(\vect v_T, q) = (\vect f_T, \vect v_T) + \gamma\,(g, \Tr E_s(\vect v_T)) \eqqcolon (\vect f_\gamma, \vect v_T),
 $$
-where we introduced an augmented bilinear form~$a_\gamma(\cdot, \cdot)$ and linear functional~$(\vect f_\gamma,\cdot)$ with a regularization parameter $\gamma \ge 0$. Thus our regularized weak problem reads as
+where we introduced an augmented bilinear form~$a_\gamma(\cdot, \cdot)$ and linear functional~$(\vect f_\gamma,\cdot)$ with a regularization parameter $\gamma \ge 0$. Thus our regularized weak problem reads: Find~$(\vect u_T, p) \in \vect V_T \times Q$ s.t.
 \begin{align}\begin{split}\label{split:tang:oseen:weak:reg}
 	a_\gamma(\vect u_T, \vect v_T) + b_T(\vect v_T, q) &= (\vect f_\gamma, \vect v_T), \\
 	-b_T(\vect u_T, q) &= (g, q).
 \end{split}\end{align}
-Note that~\eqref{split:tang:oseen:weak:reg} is consistent with~\eqref{split:tang:oseen:weak} in the sense that they have the same solution.
+holds for all~$(\vect v_T, q) \in \vect V_T \times Q$. Note that~\eqref{split:tang:oseen:weak:reg} is consistent with~\eqref{split:tang:oseen:weak} in the sense that they have the same solution. \AZ{Here we introduce trace FEM, discrete spaces, penalty, and stabilization terms\dots}
+
+Trace finite element results in a saddle-point system
+\begin{equation}\label{split:tang:system}
+	\underbrace{\begin{pmatrix}
+		\vect A & \vect B^T \\
+		\vect B & \vect C\phantom{^T}
+	\end{pmatrix}}_{\mathcal A \coloneqq}
+	\begin{pmatrix} \vect u \\ \vect p \end{pmatrix} =
+	\begin{pmatrix} \vect f \\ \vect g \end{pmatrix}. 
+\end{equation}
+We consider the block-triangular preconditioner~$\mathcal P$ for~$\mathcal A$,
+\begin{equation}\label{split:tang:prec}
+\mathcal P \coloneqq \begin{pmatrix}
+	\vect A & \vect B^T \\
+	        & \vect S\phantom{^T}
+	\end{pmatrix}
+\end{equation}
+with~$\vect S \coloneqq \vect B\,\vect A^{-1}\,\vect B^T - \vect C$. Note that (approximate) application of~$\mathcal P^{-1}$ requires (approximate) applications of~$\vect A^{-1}$ and~$\vect S^{-1}$:
+\begin{enumerate}
+	\item We utilize sparse-direct linear solver for~$\vect A$, and
+	\item for~$\vect S$ we have
+		\begin{equation}\label{split:tang:prec:schur}
+			\vect S^{-1} \simeq \vect S_M^{-1} + \vect S_L^{-1} \coloneqq \big((\nu + \gamma)^{-1}\,\vect M_p - \vect C\big)^{-1} + \big(\alpha^{-1}\,\vect L_p - \vect C\big)^{-1}
+		\end{equation}
+		with pressure mass matrix~$\vect M_p$ and pressure Laplace-Beltrami matrix~$\vect L_p$. The second term is included to deal with the dominating accumulation term, $\alpha \gg \nu$: $\vect S \simeq \alpha^{-1}\,\vect B\,\vect M_u^{-1}\,\vect B^T - \vect C$. We use CG iterations for~$\vect S_M$ and $\vect S_L$. 	
+\end{enumerate}
+
+\AZ{First I tried
+	$$
+		\vect S^{-1} \simeq \vect S_M^{-1} + \vect S_L^{-1} \coloneqq (\nu + \gamma)\,\big(\vect M_p - \vect C\big)^{-1} + \alpha\,\big(\vect L_p - \vect C\big)^{-1},
+	$$
+	which is different from~\eqref{split:tang:prec:schur}. This is what we discussed. It turned out that~\eqref{split:tang:prec:schur} leads to the robust preconditioner (w.r.t. changing both~$\nu$ and~$\alpha$!), while the above approach stays sensitive to~$\alpha$. So the scaling does matter.
+	
+	BTW, what was the name of~$\vect S_L$ preconditioner? I remember you mentioned that this technique is known from the literature.
+	
+	Average numb of iterations for~$\vect S_M$ and~$\vect S_L$ per one application of~$\mathcal P$ as I decrease~$h$:
+	\begin{itemize}
+		\item $\vect S_M$: 19, 28.2, 30.4, 32.5,
+		\item $\vect S_L$: 21.8, 43.8, 74.5, 151.3.
+	\end{itemize}
+	For both cases I use CG with relative residual based tolerance ($10^{-4}$) and max number of allowed iters = 200.
+	Note that the situation is worse for~$\vect S_L$ (somewhat expected, since the condition number of LB matrix grows as $h^{-2}$). For~$\vect S_M$ the mass matrix part dominates since we have~$\rho_p \propto h$, and it seems to be a well-conditioned matrix.
+	
+	Leaving row CG for~$\vect S_M$ is fine. What do you think we shall use for $\vect S_L$? Maybe CG with ILU(0)? Thanks to Alex, pretty much whatever is easy with Trilinos right now.
+}
 
 \subsubsection{Numerical experiments}
 
