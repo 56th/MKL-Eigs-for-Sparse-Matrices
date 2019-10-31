@@ -207,7 +207,7 @@ with~$\vect S \coloneqq \vect B\,\vect A^{-1}\,\vect B^T - \vect C$. Note that (
 		\begin{equation}\label{split:tang:prec:schur}
 			\vect S^{-1} \simeq \vect S_M^{-1} + \vect S_L^{-1} \coloneqq \big((\nu + \gamma)^{-1}\,\vect M_p - \vect C\big)^{-1} + \big(\alpha^{-1}\,\vect L_p - \vect C\big)^{-1}
 		\end{equation}
-		with pressure mass matrix~$\vect M_p$ and pressure Laplace-Beltrami matrix~$\vect L_p$. The second term is included to deal with the dominating accumulation term, $\alpha \gg \nu$: $\vect S \simeq \alpha^{-1}\,\vect B\,\vect M_u^{-1}\,\vect B^T - \vect C$. We use CG iterations for~$\vect S_M$ and $\vect S_L$. 	
+		with pressure mass matrix~$\vect M_p$ and pressure Laplace-Beltrami matrix~$\vect L_p$. The second term is included to deal with the dominating accumulation term, $\alpha \gg \nu + \gamma$: $\vect S \simeq \alpha^{-1}\,\vect B\,\vect M_u^{-1}\,\vect B^T - \vect C$. We use CG iterations for~$\vect S_M$ and $\vect S_L$. 	
 \end{enumerate}
 
 \AZ{First I tried
